@@ -129,6 +129,8 @@ def start_game():
     for player in game_state['players']:
         if game_state['players'][player]['active']:
             game_state['players'][player]['hand'] = [game_state['deck'].pop() for _ in range(5)]
+
+    game_state['phase'] = 'exchange'
     
     return jsonify({'status': 'success', 'message': 'Gra rozpoczęta!'})
 
