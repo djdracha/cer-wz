@@ -98,7 +98,7 @@ def login():
             if username not in game_state['players']:
                 game_state['players'][username] = {
                     'hand': [],
-                    'points': 100,  # Startowe punkty
+                    'points': 0,  # Startowe punkty
                     'active': True
                 }
             return redirect(url_for('game'))
@@ -210,7 +210,7 @@ def evaluate_and_award():
     
     # Przyznanie punktůw zwycięzcy
     if best_player:
-        game_state['players'][best_player]['points'] += 50
+        game_state['players'][best_player]['points'] += 1
         game_state['winner'] = best_player
     
     # Reset do nowej rundy
