@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poker 5-kartowy - Gra</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .header {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+        }
+        
+        .logout-btn {
+            background: #e74c3c;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        .game-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .status-bar {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .status-bar h2 {
+            margin-bottom: 10px;
+        }
+        
+        .points {
+            font-size: 24px;
+            color: #f1c40f;
+            margin-top: 10px;
+        }
+        
+        .cards-area {
+            background: rgba(255,255,255,0.05);
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .cards-title {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+        
+        .cards {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .card {
+            width: 100px;
+            height: 140px;
+            background: white;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            user-select: none;
+        }
+        
+        .card.red {
+            color: #e74c3c;
+        }
+        
+        .card.black {
+            color: #2c3e50;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(255,255,255,0.3);
+        }
+        
+        .card.selected {
+            transform: translateY(-15px);
+            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.5);
+            border: 3px solid #e74c3c;
+        }
+        
+        .card .rank {
+            font-size: 28px;
+            font-weight: bold;
+        }
+        
+        .card .suit {
+            font-size: 32px;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 15px 40px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .players-list {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .players-list h3 {
+            margin-bottom: 15px;
+        }
+        
+        .player-item {
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .player-item.current {
+            background: rgba(241, 196, 15, 0.3);
+            border-left: 4px solid #f1c40f;
+        }
+        
+        .message {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 18px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🃏 Poker 5-kartowy</h1>
+        <div>
+            <span id="current-user">{{ username }}</span>
+            <a href="/logout" class="logout-btn">Wyloguj</a>
+        </div>
+    </div>
+    
+    <div class="game-container">
+        <div class="status-bar">
+            <h2 id="phase-text">Oczekiwanie na rozpoczęcie gry</h2>
+            <div class="points">Twoje punkty: <span id="player-points">100</span></div>
+        </div>
+        
+        <div id="start-message" class="message">
+            Kliknij "Rozpocznij grę", aby zacząć nową rundę
+        </div>
+        
+        <div id="game-area" class="hidden">
+            <div class="cards-area">
+                <div class="cards-title">Twoje karty</div>
+                <div class="cards" id="player-cards">
+                    <!-- Karty będą tutaj -->
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button id="start-btn" class="btn btn-primary" onclick="startGame()">Rozpocznij grę</button>
+                <button id="exchange-btn" class="btn btn-success hidden" onclick="exchangeCards()">Wymień zaznaczone</button>
+                <button id="stand-btn" class="btn btn-warning hidden" onclick="stand()">Pasuj</button>
+                <button id="next-round-btn" class="btn btn-primary hidden" onclick="nextRound()">Następna runda</button>
+            </div>
+        </div>
+        
+        <div class="players-list">
+            <h3>Gracze</h3>
+            <div id="players-container">
+                <!-- Lista graczy -->
+            </div>
+        </div>
+        
+        <div id="winner-message" class="message hidden"></div>
+    </div>
+    
+    <script>
+        let selectedCards = [];
+        let gameState = {};
+        
+        // Odświeżanie stanu gry co 2 sekundy
+        setInterval(updateGameState, 2000);
+        
+        async function updateGameState() {
+            try {
+                const response = await fetch('/api/get_state');
+                const data = await response.json();
+                gameState = data;
+                
+                document.getElementById('player-points').textContent = data.points;
+                
+                // Aktualizacja fazy gry
+                const phaseText = document.getElementById('phase-text');
+                const startMsg = document.getElementById('start-message');
+                const gameArea = document.getElementById('game-area');
+                const startBtn = document.getElementById('start-btn');
+                const exchangeBtn = document.getElementById('exchange-btn');
+                const standBtn = document.getElementById('stand-btn');
+                const nextRoundBtn = document.getElementById('next-round-btn');
+                
+                if (data.phase === 'waiting') {
+                    phaseText.textContent = 'Oczekiwanie na rozpoczęcie gry';
+                    startMsg.classList.remove('hidden');
+                    gameArea.classList.add('hidden');
+                } else {
+                    startMsg.classList.add('hidden');
+                    gameArea.classList.remove('hidden');
+                    
+                    if (data.phase === 'dealing') {
+                        phaseText.textContent = 'Rozdawanie kart...';
+                        startBtn.classList.add('hidden');
+                        exchangeBtn.classList.add('hidden');
+                        standBtn.classList.add('hidden');
+                    } else if (data.phase === 'exchange') {
+                        if (data.current_player === data.username) {
+                            phaseText.textContent = 'Twó�¡¡ kolej! Wybierz karty do wymiany';
+                            exchangeBtn.classList.remove('hidden');
+                            standBtn.classList.remove('hidden');
+                        } else {
+                            phaseText.textContent = `Kolej gracza: ${data.current_player}`;
+                            exchangeBtn.classList.add('hidden');
+                            standBtn.classList.add('hidden');
+                        }
+                    } else if (data.phase === 'showdown') {
+                        phaseText.textContent = 'Pokazywanie kart!';
+                        exchangeBtn.classList.add('hidden');
+                        standBtn.classList.add('hidden');
+                        nextRoundBtn.classList.remove('hidden');
+                    }
+                }
+                
+                // Wyświetlanie kart
+                if (data.hand && data.hand.length > 0) {
+                    renderCards(data.hand);
+                }
+                
+                // Aktualizacja listy graczy
+                updatePlayersList(data);
+                
+            } catch (error) {
+                console.error('Bland podczas pobierania stanu gry:', error);
+            }
+        }
+        
+        function renderCards(hand) {
+            const container = document.getElementById('player-cards');
+            container.innerHTML = '';
+            
+            hand.forEach((card, index) => {
+                const cardEl = document.createElement('div');
+                const isRed = card.suit === '♥' || card.suit === '♦';
+                cardEl.className = `card ${isRed ? 'red' : 'black'}`;
+                if (selectedCards.includes(index)) {
+                    cardEl.classList.add('selected');
+                }
+                
+                cardEl.innerHTML = `
+                    <div class="rank">${card.rank}</div>
+                    <div class="suit">${card.suit}</div>
+                `;
+                
+                cardEl.onclick = () => toggleCard(index);
+                container.appendChild(cardEl);
+            });
+        }
+        
+        function toggleCard(index) {
+            if (gameState.phase !== 'exchange' || gameState.current_player !== gameState.username) {
+                return;
+            }
+            
+            if (selectedCards.includes(index)) {
+                selectedCards = selectedCards.filter(i => i !== index);
+            } else {
+                selectedCards.push(index);
+            }
+            
+            // Ponowne renderowanie aby pokazać zaznaczenie
+            renderCards(gameState.hand);
+        }
+        
+        async function startGame() {
+            try {
+                const response = await fetch('/api/start_game', {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    selectedCards = [];
+                    updateGameState();
+                }
+            } catch (error) {
+                console.error('Bland podczas startu gry:', error);
+            }
+        }
+        
+        async function exchangeCards() {
+            try {
+                const response = await fetch('/api/exchange_cards', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        cards: selectedCards
+                    })
+                });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    selectedCards = [];
+                    updateGameState();
+                }
+            } catch (error) {
+                console.error('Bland podczas wymiany kart:', error);
+            }
+        }
+        
+        async function stand() {
+            try {
+                const response = await fetch('/api/stand', {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    updateGameState();
+                }
+            } catch (error) {
+                console.error('Bland podczas pasowania:', error);
+            }
+        }
+        
+        async function nextRound() {
+            try {
+                const response = await fetch('/api/next_round', {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    selectedCards = [];
+                    updateGameState();
+                }
+            } catch (error) {
+                console.error('Bland podczas nowej rundy:', error);
+            }
+        }
+        
+        function updatePlayersList(data) {
+            const container = document.getElementById('players-container');
+            container.innerHTML = '';
+            
+            data.players.forEach(player => {
+                const playerEl = document.createElement('div');
+                playerEl.className = 'player-item';
+                if (player === data.current_player) {
+                    playerEl.classList.add('current');
+                }
+                
+                const playerPoints = data.points || 100;
+                playerEl.innerHTML = `
+                    <span>${player}</span>
+                    <span>${playerPoints} pkt</span>
+                `;
+                
+                container.appendChild(playerEl);
+            });
+        }
+        
+        // Inicjalizacja
+        updateGameState();
+    </script>
+</body>
+</html>
