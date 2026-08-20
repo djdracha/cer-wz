@@ -120,19 +120,22 @@ def game():
 @app.route('/api/start_game', methods=['POST'])
 @login_required
 def start_game():
-    """Rozpocznij nową grę"""
     game_state['deck'] = create_deck()
     game_state['phase'] = 'dealing'
     game_state['current_player'] = list(game_state['players'].keys())[0]
-    
-    # Rozdaj 5 kart każdemu graczowi
+
     for player in game_state['players']:
         if game_state['players'][player]['active']:
-            game_state['players'][player]['hand'] = [game_state['deck'].pop() for _ in range(5)]
+            game_state['players'][player]['hand'] = [
+                game_state['deck'].pop() for _ in range(5)
+            ]
 
     game_state['phase'] = 'exchange'
-    
-    return jsonify({'status': 'success', 'message': 'Gra rozpoczęta!'})
+
+    return jsonify({
+        'status': 'success',
+        'message': 'Gra rozpoczęta!'
+    })
 
 @app.route('/api/get_state')
 @login_required
