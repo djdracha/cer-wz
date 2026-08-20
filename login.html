@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poker 5-kartowy - Logowanie</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .error {
+            background: #fee;
+            color: #c00;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .info {
+            background: #eef;
+            color: #33a;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-size: 13px;
+        }
+        
+        .info h3 {
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .info ul {
+            margin-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>🃏 Poker 5-kartowy</h1>
+        <p class="subtitle">Gra na punkty dla maksymalnie 6 graczy</p>
+        
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+        
+        <form method="POST">
+            <div class="form-group">
+                <label for="username">Nazwa użytkownika</label>
+                <input type="text" id="username" name="username" required 
+                       placeholder="np. gracz1">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Haslo</label>
+                <input type="password" id="password" name="password" required 
+                       placeholder="Wprowadz haslo">
+            </div>
+            
+            <button type="submit" class="btn">Zaloguj się</button>
+        </form>
+        
+        <div class="info">
+            <h3>Dostępni użytkownicy:</h3>
+            <ul>
+                <li>gracz1 / haslo1</li>
+                <li>gracz2 / haslo2</li>
+                <li>gracz3 / haslo3</li>
+                <li>gracz4 / haslo4</li>
+                <li>gracz5 / haslo5</li>
+                <li>gracz6 / haslo6</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
