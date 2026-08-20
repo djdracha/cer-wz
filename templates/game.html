@@ -221,7 +221,7 @@
     <div class="game-container">
         <div class="status-bar">
             <h2 id="phase-text">Oczekiwanie na rozpoczęcie gry</h2>
-            <div class="points">Twoje punkty: <span id="player-points">100</span></div>
+            <div class="points">Twoje punkty: <span id="player-points">1</span></div>
         </div>
         
         <div id="start-message" class="message">
@@ -323,7 +323,7 @@
                 updatePlayersList(data);
                 
             } catch (error) {
-                console.error('Bland podczas pobierania stanu gry:', error);
+                console.error('Błąd podczas pobierania stanu gry:', error);
             }
         }
         
@@ -375,7 +375,7 @@
                     updateGameState();
                 }
             } catch (error) {
-                console.error('Bland podczas startu gry:', error);
+                console.error('Błąd podczas startu gry:', error);
             }
         }
         
@@ -396,7 +396,7 @@
                     updateGameState();
                 }
             } catch (error) {
-                console.error('Bland podczas wymiany kart:', error);
+                console.error('Błąd podczas wymiany kart:', error);
             }
         }
         
@@ -410,7 +410,7 @@
                     updateGameState();
                 }
             } catch (error) {
-                console.error('Bland podczas pasowania:', error);
+                console.error('Błąd podczas pasowania:', error);
             }
         }
         
@@ -425,7 +425,7 @@
                     updateGameState();
                 }
             } catch (error) {
-                console.error('Bland podczas nowej rundy:', error);
+                console.error('Błąd podczas nowej rundy:', error);
             }
         }
         
