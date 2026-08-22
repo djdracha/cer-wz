@@ -153,20 +153,26 @@ def start_game():
 @app.route('/api/get_state')
 @login_required
 def get_state():
-    """Pobierz aktualny stan gry"""
     username = session['username']
-    
-    # Przygotuj dane dla klienta
+
+    players_data = {}
+
+    for player, data in game_state['players'].items():
+        players_data[player] = {
+            'points': data['points'],
+            'active': data['active']
+        }
+
     player_data = {
         'username': username,
         'hand': game_state['players'].get(username, {}).get('hand', []),
         'points': game_state['players'].get(username, {}).get('points', 100),
         'phase': game_state['phase'],
         'current_player': game_state['current_player'],
-        'players': list(game_state['players'].keys()),
-        'active_players': [p for p in game_state['players'] if game_state['players'][p]['active']]
+        'players': players_data,
+        'winner': game_state.get('winner')
     }
-    
+
     return jsonify(player_data)
 
 @app.route('/api/exchange_cards', methods=['POST'])
