@@ -130,10 +130,10 @@ def start_game():
             'status': 'error',
             'message': 'Do rozpoczęcia gry potrzebnych jest co najmniej 2 graczy.'
         }), 400
-
+    
     # Jedna wspólna, potasowana talia na całą rundę.
     game_state['deck'] = create_deck()
-
+    game_state['winner'] = None
     # Każdy aktywny gracz dostaje 5 innych kart.
     for player in active_players:
         game_state['players'][player]['hand'] = [
@@ -163,15 +163,15 @@ def get_state():
             'active': data['active']
         }
 
-    player_data = {
-        'username': username,
-        'hand': game_state['players'].get(username, {}).get('hand', []),
-        'points': game_state['players'].get(username, {}).get('points', 1),
-        'phase': game_state['phase'],
-        'current_player': game_state['current_player'],
-        'players': players_data,
-        'winner': game_state.get('winner')
-    }
+player_data = {
+    'username': username,
+    'hand': game_state['players'].get(username, {}).get('hand', []),
+    'points': game_state['players'].get(username, {}).get('points', 100),
+    'phase': game_state['phase'],
+    'current_player': game_state['current_player'],
+    'players': players_data,
+    'winner': game_state.get('winner')
+}
 
     return jsonify(player_data)
 
@@ -226,10 +226,10 @@ def evaluate_and_award():
                 best_player = player
 
     if best_player is not None:
-        game_state['players'][best_player]['points'] += 1
+        game_state['players'][best_player]['points'] += 50
         game_state['winner'] = best_player
-    
-    # Reset do nowej rundy
+        game_state['winning_score'] = best_score
+
     game_state['phase'] = 'showdown'
 
 @app.route('/api/next_round', methods=['POST'])
