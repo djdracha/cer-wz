@@ -386,10 +386,14 @@ if (data.phase === 'waiting') {
         }
         
 async function startGame() {
+    console.log('Kliknięto przycisk Rozpocznij grę');
+
     try {
         const response = await fetch('/api/start_game', {
             method: 'POST'
         });
+
+        console.log('Odpowiedź serwera:', response.status);
 
         const data = await response.json();
 
@@ -399,7 +403,7 @@ async function startGame() {
         }
 
         selectedCards = [];
-        updateGameState();
+        await updateGameState();
     } catch (error) {
         console.error('Błąd podczas startu gry:', error);
         alert('Wystąpił błąd połączenia z serwerem.');
@@ -477,6 +481,16 @@ function updatePlayersList(data) {
 }
         
         // Inicjalizacja
+        document.addEventListener('DOMContentLoaded', function () {
+    const startButton = document.getElementById('start-btn');
+
+    if (!startButton) {
+        console.error('Nie znaleziono przycisku start-btn');
+        return;
+    }
+
+    startButton.addEventListener('click', startGame);
+});
         document.getElementById('start-btn').addEventListener('click', startGame);
         document.getElementById('exchange-btn').addEventListener('click', exchangeCards);
         document.getElementById('stand-btn').addEventListener('click', stand);
