@@ -278,16 +278,17 @@
                 const standBtn = document.getElementById('stand-btn');
                 const nextRoundBtn = document.getElementById('next-round-btn');
                 
-                 if (data.phase === 'waiting') {
-                 phaseText.textContent = 'Oczekiwanie na rozpoczęcie gry';
-                 startMsg.classList.remove('hidden');
-                 gameArea.classList.remove('hidden');
+if (data.phase === 'waiting') {
+    phaseText.textContent = 'Oczekiwanie na rozpoczęcie gry';
+    startMsg.classList.remove('hidden');
+    gameArea.classList.remove('hidden');
+    document.getElementById('winner-message').classList.add('hidden');
 
-                 startBtn.classList.remove('hidden');
-                 exchangeBtn.classList.add('hidden');
-                 standBtn.classList.add('hidden');
-                 nextRoundBtn.classList.add('hidden');
-                }  else {
+    startBtn.classList.remove('hidden');
+    exchangeBtn.classList.add('hidden');
+    standBtn.classList.add('hidden');
+    nextRoundBtn.classList.add('hidden');
+}  else {
                     startMsg.classList.add('hidden');
                     gameArea.classList.remove('hidden');
                     
@@ -307,12 +308,21 @@
                             standBtn.classList.add('hidden');
                         }
                     } else if (data.phase === 'showdown') {
-                        phaseText.textContent = 'Pokazywanie kart!';
-                        exchangeBtn.classList.add('hidden');
-                        standBtn.classList.add('hidden');
-                        nextRoundBtn.classList.remove('hidden');
-                    }
-                }
+    phaseText.textContent = 'Koniec rundy!';
+    exchangeBtn.classList.add('hidden');
+    standBtn.classList.add('hidden');
+    nextRoundBtn.classList.remove('hidden');
+
+    const winnerMessage = document.getElementById('winner-message');
+
+    if (data.winner) {
+        winnerMessage.textContent = `Zwycięzca rundy: ${data.winner}. Otrzymuje 1 pkt!`;
+        winnerMessage.classList.remove('hidden');
+    } else {
+        winnerMessage.textContent = 'Runda zakończona.';
+        winnerMessage.classList.remove('hidden');
+    }
+}
                 
                 // Wyświetlanie kart
                 if (data.hand && data.hand.length > 0) {
