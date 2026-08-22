@@ -166,7 +166,7 @@ def get_state():
     player_data = {
         'username': username,
         'hand': game_state['players'].get(username, {}).get('hand', []),
-        'points': game_state['players'].get(username, {}).get('points', 100),
+        'points': game_state['players'].get(username, {}).get('points', 1),
         'phase': game_state['phase'],
         'current_player': game_state['current_player'],
         'players': players_data,
