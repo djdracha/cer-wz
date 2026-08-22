@@ -266,236 +266,247 @@
     </div>
     
     <script>
-        let selectedCards = [];
-        let gameState = {};
-        
-        // Odświeżanie stanu gry co 2 sekundy
-        setInterval(updateGameState, 2000);
-        
-        async function updateGameState() {
-            try {
-                const response = await fetch('/api/get_state');
-                const data = await response.json();
-                gameState = data;
-                
-                document.getElementById('player-points').textContent = data.points;
-                
-                // Aktualizacja fazy gry
-                const phaseText = document.getElementById('phase-text');
-                const startMsg = document.getElementById('start-message');
-                const gameArea = document.getElementById('game-area');
-                const startBtn = document.getElementById('start-btn');
-                const exchangeBtn = document.getElementById('exchange-btn');
-                const standBtn = document.getElementById('stand-btn');
-                const nextRoundBtn = document.getElementById('next-round-btn');
-                
-if (data.phase === 'waiting') {
-    phaseText.textContent = 'Oczekiwanie na rozpoczęcie gry';
-    startMsg.classList.remove('hidden');
-    gameArea.classList.remove('hidden');
-    document.getElementById('winner-message').classList.add('hidden');
+    let selectedCards = [];
+    let gameState = {};
 
-    startBtn.classList.remove('hidden');
-    exchangeBtn.classList.add('hidden');
-    standBtn.classList.add('hidden');
-    nextRoundBtn.classList.add('hidden');
-}  else {
-                    startMsg.classList.add('hidden');
-                    gameArea.classList.remove('hidden');
-                    
-                    if (data.phase === 'dealing') {
-                        phaseText.textContent = 'Rozdawanie kart...';
-                        startBtn.classList.add('hidden');
+    setInterval(updateGameState, 2000);
+
+    async function updateGameState() {
+        try {
+            const response = await fetch('/api/get_state');
+            const data = await response.json();
+
+            gameState = data;
+
+            document.getElementById('player-points').textContent = data.points;
+
+            const phaseText = document.getElementById('phase-text');
+            const startMsg = document.getElementById('start-message');
+            const gameArea = document.getElementById('game-area');
+            const startBtn = document.getElementById('start-btn');
+            const exchangeBtn = document.getElementById('exchange-btn');
+            const standBtn = document.getElementById('stand-btn');
+            const nextRoundBtn = document.getElementById('next-round-btn');
+            const winnerMessage = document.getElementById('winner-message');
+
+            if (data.phase === 'waiting') {
+                phaseText.textContent = 'Oczekiwanie na rozpoczęcie gry';
+                startMsg.classList.remove('hidden');
+                gameArea.classList.remove('hidden');
+                startBtn.classList.remove('hidden');
+                exchangeBtn.classList.add('hidden');
+                standBtn.classList.add('hidden');
+                nextRoundBtn.classList.add('hidden');
+                winnerMessage.classList.add('hidden');
+            } else {
+                startMsg.classList.add('hidden');
+                gameArea.classList.remove('hidden');
+                startBtn.classList.add('hidden');
+
+                if (data.phase === 'dealing') {
+                    phaseText.textContent = 'Rozdawanie kart...';
+                    exchangeBtn.classList.add('hidden');
+                    standBtn.classList.add('hidden');
+                    nextRoundBtn.classList.add('hidden');
+                } else if (data.phase === 'exchange') {
+                    nextRoundBtn.classList.add('hidden');
+                    winnerMessage.classList.add('hidden');
+
+                    if (data.current_player === data.username) {
+                        phaseText.textContent = 'Twoja kolej! Wybierz karty do wymiany';
+                        exchangeBtn.classList.remove('hidden');
+                        standBtn.classList.remove('hidden');
+                    } else {
+                        phaseText.textContent = `Kolej gracza: ${data.current_player}`;
                         exchangeBtn.classList.add('hidden');
                         standBtn.classList.add('hidden');
-                    } else if (data.phase === 'exchange') {
-                        if (data.current_player === data.username) {
-                            phaseText.textContent = 'Twoja kolej! Wybierz karty do wymiany';
-                            exchangeBtn.classList.remove('hidden');
-                            standBtn.classList.remove('hidden');
-                        } else {
-                            phaseText.textContent = `Kolej gracza: ${data.current_player}`;
-                            exchangeBtn.classList.add('hidden');
-                            standBtn.classList.add('hidden');
-                        }
-                    } else if (data.phase === 'showdown') {
-    phaseText.textContent = 'Koniec rundy!';
-    exchangeBtn.classList.add('hidden');
-    standBtn.classList.add('hidden');
-    nextRoundBtn.classList.remove('hidden');
+                    }
+                } else if (data.phase === 'showdown') {
+                    phaseText.textContent = 'Koniec rundy!';
+                    exchangeBtn.classList.add('hidden');
+                    standBtn.classList.add('hidden');
+                    nextRoundBtn.classList.remove('hidden');
 
-    const winnerMessage = document.getElementById('winner-message');
+                    if (data.winner) {
+                        winnerMessage.textContent =
+                            `Zwycięzca rundy: ${data.winner}. Otrzymuje 50 pkt!`;
+                    } else {
+                        winnerMessage.textContent = 'Runda zakończona.';
+                    }
 
-    if (data.winner) {
-        winnerMessage.textContent = `Zwycięzca rundy: ${data.winner}. Otrzymuje 1 pkt!`;
-        winnerMessage.classList.remove('hidden');
-    } else {
-        winnerMessage.textContent = 'Runda zakończona.';
-        winnerMessage.classList.remove('hidden');
+                    winnerMessage.classList.remove('hidden');
+                }
+            }
+
+            if (data.hand && data.hand.length > 0) {
+                renderCards(data.hand);
+            }
+
+            updatePlayersList(data);
+
+        } catch (error) {
+            console.error('Błąd podczas pobierania stanu gry:', error);
+        }
     }
-}
-                
-                // Wyświetlanie kart
-                if (data.hand && data.hand.length > 0) {
-                    renderCards(data.hand);
-                }
-                
-                // Aktualizacja listy graczy
-                updatePlayersList(data);
-                
-            } catch (error) {
-                console.error('Błąd podczas pobierania stanu gry:', error);
-            }
-        }
-        
-        function renderCards(hand) {
-            const container = document.getElementById('player-cards');
-            container.innerHTML = '';
-            
-            hand.forEach((card, index) => {
-                const cardEl = document.createElement('div');
-                const isRed = card.suit === '♥' || card.suit === '♦';
-                cardEl.className = `card ${isRed ? 'red' : 'black'}`;
-                if (selectedCards.includes(index)) {
-                    cardEl.classList.add('selected');
-                }
-                
-                cardEl.innerHTML = `
-                    <div class="rank">${card.rank}</div>
-                    <div class="suit">${card.suit}</div>
-                `;
-                
-                cardEl.onclick = () => toggleCard(index);
-                container.appendChild(cardEl);
-            });
-        }
-        
-        function toggleCard(index) {
-            if (gameState.phase !== 'exchange' || gameState.current_player !== gameState.username) {
-                return;
-            }
-            
+
+    function renderCards(hand) {
+        const container = document.getElementById('player-cards');
+        container.innerHTML = '';
+
+        hand.forEach((card, index) => {
+            const cardEl = document.createElement('div');
+            const isRed = card.suit === '♥' || card.suit === '♦';
+
+            cardEl.className = `card ${isRed ? 'red' : 'black'}`;
+
             if (selectedCards.includes(index)) {
-                selectedCards = selectedCards.filter(i => i !== index);
-            } else {
-                selectedCards.push(index);
+                cardEl.classList.add('selected');
             }
-            
-            // Ponowne renderowanie aby pokazać zaznaczenie
-            renderCards(gameState.hand);
-        }
-        
-async function startGame() {
-    console.log('Kliknięto przycisk Rozpocznij grę');
 
-    try {
-        const response = await fetch('/api/start_game', {
-            method: 'POST'
+            cardEl.innerHTML = `
+                <div class="rank">${card.rank}</div>
+                <div class="suit">${card.suit}</div>
+            `;
+
+            cardEl.addEventListener('click', () => toggleCard(index));
+            container.appendChild(cardEl);
         });
+    }
 
-        console.log('Odpowiedź serwera:', response.status);
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            alert(data.message || 'Nie udało się rozpocząć gry.');
+    function toggleCard(index) {
+        if (
+            gameState.phase !== 'exchange' ||
+            gameState.current_player !== gameState.username
+        ) {
             return;
         }
 
-        selectedCards = [];
-        await updateGameState();
-    } catch (error) {
-        console.error('Błąd podczas startu gry:', error);
-        alert('Wystąpił błąd połączenia z serwerem.');
-    }
-}      
-        async function exchangeCards() {
-            try {
-                const response = await fetch('/api/exchange_cards', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        cards: selectedCards
-                    })
-                });
-                const data = await response.json();
-                if (data.status === 'success') {
-                    selectedCards = [];
-                    updateGameState();
-                }
-            } catch (error) {
-                console.error('Błąd podczas wymiany kart:', error);
-            }
-        }
-        
-        async function stand() {
-            try {
-                const response = await fetch('/api/stand', {
-                    method: 'POST'
-                });
-                const data = await response.json();
-                if (data.status === 'success') {
-                    updateGameState();
-                }
-            } catch (error) {
-                console.error('Błąd podczas pasowania:', error);
-            }
-        }
-        
-        async function nextRound() {
-            try {
-                const response = await fetch('/api/next_round', {
-                    method: 'POST'
-                });
-                const data = await response.json();
-                if (data.status === 'success') {
-                    selectedCards = [];
-                    updateGameState();
-                }
-            } catch (error) {
-                console.error('Błąd podczas nowej rundy:', error);
-            }
-        }
-        
-function updatePlayersList(data) {
-    const container = document.getElementById('players-container');
-    container.innerHTML = '';
-
-    for (const [player, playerData] of Object.entries(data.players)) {
-        const playerEl = document.createElement('div');
-        playerEl.className = 'player-item';
-
-        if (player === data.current_player) {
-            playerEl.classList.add('current');
+        if (selectedCards.includes(index)) {
+            selectedCards = selectedCards.filter(cardIndex => cardIndex !== index);
+        } else {
+            selectedCards.push(index);
         }
 
-        playerEl.innerHTML = `
-            <span>${player}</span>
-            <span>${playerData.points} pkt</span>
-        `;
-
-        container.appendChild(playerEl);
-    }
-}
-        
-        // Inicjalizacja
-        document.addEventListener('DOMContentLoaded', function () {
-    const startButton = document.getElementById('start-btn');
-
-    if (!startButton) {
-        console.error('Nie znaleziono przycisku start-btn');
-        return;
+        renderCards(gameState.hand);
     }
 
-    startButton.addEventListener('click', startGame);
-});
-        document.getElementById('start-btn').addEventListener('click', startGame);
-        document.getElementById('exchange-btn').addEventListener('click', exchangeCards);
-        document.getElementById('stand-btn').addEventListener('click', stand);
-        document.getElementById('next-round-btn').addEventListener('click', nextRound);
-        updateGameState();
-    </script>
+    async function startGame() {
+        try {
+            const response = await fetch('/api/start_game', {
+                method: 'POST'
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                alert(data.message || 'Nie udało się rozpocząć gry.');
+                return;
+            }
+
+            selectedCards = [];
+            await updateGameState();
+
+        } catch (error) {
+            console.error('Błąd podczas rozpoczęcia gry:', error);
+            alert('Wystąpił błąd połączenia z serwerem.');
+        }
+    }
+
+    async function exchangeCards() {
+        try {
+            const response = await fetch('/api/exchange_cards', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    cards: selectedCards
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                alert(data.message || 'Nie udało się wymienić kart.');
+                return;
+            }
+
+            selectedCards = [];
+            await updateGameState();
+
+        } catch (error) {
+            console.error('Błąd podczas wymiany kart:', error);
+        }
+    }
+
+    async function stand() {
+        try {
+            const response = await fetch('/api/stand', {
+                method: 'POST'
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                alert(data.message || 'Nie udało się zakończyć tury.');
+                return;
+            }
+
+            await updateGameState();
+
+        } catch (error) {
+            console.error('Błąd podczas pasowania:', error);
+        }
+    }
+
+    async function nextRound() {
+        try {
+            const response = await fetch('/api/next_round', {
+                method: 'POST'
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                alert(data.message || 'Nie udało się rozpocząć kolejnej rundy.');
+                return;
+            }
+
+            selectedCards = [];
+            await updateGameState();
+
+        } catch (error) {
+            console.error('Błąd podczas rozpoczęcia nowej rundy:', error);
+        }
+    }
+
+    function updatePlayersList(data) {
+        const container = document.getElementById('players-container');
+        container.innerHTML = '';
+
+        for (const [player, playerData] of Object.entries(data.players)) {
+            const playerEl = document.createElement('div');
+            playerEl.className = 'player-item';
+
+            if (player === data.current_player) {
+                playerEl.classList.add('current');
+            }
+
+            playerEl.innerHTML = `
+                <span>${player}</span>
+                <span>${playerData.points} pkt</span>
+            `;
+
+            container.appendChild(playerEl);
+        }
+    }
+
+    document.getElementById('start-btn').addEventListener('click', startGame);
+    document.getElementById('exchange-btn').addEventListener('click', exchangeCards);
+    document.getElementById('stand-btn').addEventListener('click', stand);
+    document.getElementById('next-round-btn').addEventListener('click', nextRound);
+
+    updateGameState();
+</script>
 </body>
 </html>
