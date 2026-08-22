@@ -120,21 +120,34 @@ def game():
 @app.route('/api/start_game', methods=['POST'])
 @login_required
 def start_game():
+    active_players = [
+        player for player, data in game_state['players'].items()
+        if data['active']
+    ]
+
+    if len(active_players) < 2:
+        return jsonify({
+            'status': 'error',
+            'message': 'Do rozpoczęcia gry potrzebnych jest co najmniej 2 graczy.'
+        }), 400
+
+    # Jedna wspólna, potasowana talia na całą rundę.
     game_state['deck'] = create_deck()
-    game_state['phase'] = 'dealing'
-    game_state['current_player'] = list(game_state['players'].keys())[0]
 
-    for player in game_state['players']:
-        if game_state['players'][player]['active']:
-            game_state['players'][player]['hand'] = [
-                game_state['deck'].pop() for _ in range(5)
-            ]
+    # Każdy aktywny gracz dostaje 5 innych kart.
+    for player in active_players:
+        game_state['players'][player]['hand'] = [
+            game_state['deck'].pop() for _ in range(5)
+        ]
 
+    game_state['current_player'] = active_players[0]
     game_state['phase'] = 'exchange'
+    game_state['winner'] = None
 
     return jsonify({
         'status': 'success',
-        'message': 'Gra rozpoczęta!'
+        'message': 'Rozdano karty z jednej wspólnej talii.',
+        'cards_left_in_deck': len(game_state['deck'])
     })
 
 @app.route('/api/get_state')
