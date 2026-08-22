@@ -122,19 +122,18 @@ def game():
 def start_game():
     active_players = [
         player for player, data in game_state['players'].items()
-        if data['active']
+        if data.get('active', True)
     ]
 
     if len(active_players) < 2:
         return jsonify({
             'status': 'error',
-            'message': 'Do rozpoczęcia gry potrzebnych jest co najmniej 2 graczy.'
+            'message': 'Do rozpoczęcia gry muszą być zalogowani co najmniej 2 gracze.'
         }), 400
-    
-    # Jedna wspólna, potasowana talia na całą rundę.
+
     game_state['deck'] = create_deck()
     game_state['winner'] = None
-    # Każdy aktywny gracz dostaje 5 innych kart.
+
     for player in active_players:
         game_state['players'][player]['hand'] = [
             game_state['deck'].pop() for _ in range(5)
@@ -142,12 +141,10 @@ def start_game():
 
     game_state['current_player'] = active_players[0]
     game_state['phase'] = 'exchange'
-    game_state['winner'] = None
 
     return jsonify({
         'status': 'success',
-        'message': 'Rozdano karty z jednej wspólnej talii.',
-        'cards_left_in_deck': len(game_state['deck'])
+        'message': 'Gra rozpoczęta.'
     })
 
 @app.route('/api/get_state')
@@ -159,19 +156,19 @@ def get_state():
 
     for player, data in game_state['players'].items():
         players_data[player] = {
-            'points': data['points'],
-            'active': data['active']
+            'points': data.get('points', 1),
+            'active': data.get('active', True)
         }
 
-    player_data = {
+    return jsonify({
         'username': username,
         'hand': game_state['players'].get(username, {}).get('hand', []),
-        'points': game_state['players'].get(username, {}).get('points', 100),
-        'phase': game_state['phase'],
-        'current_player': game_state['current_player'],
+        'points': game_state['players'].get(username, {}).get('points', 1),
+        'phase': game_state.get('phase', 'waiting'),
+        'current_player': game_state.get('current_player'),
         'players': players_data,
         'winner': game_state.get('winner')
-    }
+    })
 
     return jsonify(player_data)
     
@@ -214,22 +211,28 @@ def exchange_cards():
     return jsonify({'status': 'success'})
 
 def evaluate_and_award():
-    best_score = -1
-    best_player = None
+    active_players = [
+        player for player, data in game_state['players'].items()
+        if data.get('active', True) and len(data.get('hand', [])) == 5
+    ]
 
-    for player, data in game_state['players'].items():
-        if data['active']:
-            score = evaluate_hand(data['hand'])
+    if not active_players:
+        game_state['winner'] = None
+        game_state['phase'] = 'showdown'
+        return
 
-            if score > best_score:
-                best_score = score
-                best_player = player
+    best_player = active_players[0]
+    best_score = evaluate_hand(game_state['players'][best_player]['hand'])
 
-    if best_player is not None:
-        game_state['players'][best_player]['points'] += 50
-        game_state['winner'] = best_player
-        game_state['winning_score'] = best_score
+    for player in active_players[1:]:
+        score = evaluate_hand(game_state['players'][player]['hand'])
 
+        if score > best_score:
+            best_score = score
+            best_player = player
+
+    game_state['players'][best_player]['points'] += 50
+    game_state['winner'] = best_player
     game_state['phase'] = 'showdown'
 
 @app.route('/api/next_round', methods=['POST'])
