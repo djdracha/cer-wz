@@ -429,26 +429,26 @@
             }
         }
         
-        function updatePlayersList(data) {
-            const container = document.getElementById('players-container');
-            container.innerHTML = '';
-            
-            data.players.forEach(player => {
-                const playerEl = document.createElement('div');
-                playerEl.className = 'player-item';
-                if (player === data.current_player) {
-                    playerEl.classList.add('current');
-                }
-                
-                const playerPoints = data.points || 100;
-                playerEl.innerHTML = `
-                    <span>${player}</span>
-                    <span>${playerPoints} pkt</span>
-                `;
-                
-                container.appendChild(playerEl);
-            });
+function updatePlayersList(data) {
+    const container = document.getElementById('players-container');
+    container.innerHTML = '';
+
+    for (const [player, playerData] of Object.entries(data.players)) {
+        const playerEl = document.createElement('div');
+        playerEl.className = 'player-item';
+
+        if (player === data.current_player) {
+            playerEl.classList.add('current');
         }
+
+        playerEl.innerHTML = `
+            <span>${player}</span>
+            <span>${playerData.points} pkt</span>
+        `;
+
+        container.appendChild(playerEl);
+    }
+}
         
         // Inicjalizacja
         updateGameState();
