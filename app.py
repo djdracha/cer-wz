@@ -214,21 +214,18 @@ def exchange_cards():
     return jsonify({'status': 'success'})
 
 def evaluate_and_award():
-    """Oceń ukklady i przyznaj punkty"""
-    best_hand = None
     best_score = -1
     best_player = None
-    
+
     for player, data in game_state['players'].items():
         if data['active']:
             score = evaluate_hand(data['hand'])
+
             if score > best_score:
                 best_score = score
                 best_player = player
-                best_hand = data['hand']
-    
-    # Przyznanie punktůw zwycięzcy
-    if best_player:
+
+    if best_player is not None:
         game_state['players'][best_player]['points'] += 1
         game_state['winner'] = best_player
     
