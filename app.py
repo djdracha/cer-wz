@@ -231,7 +231,7 @@ def evaluate_and_award():
             best_score = score
             best_player = player
 
-    game_state['players'][best_player]['points'] += 50
+    game_state['players'][best_player]['points'] += 1
     game_state['winner'] = best_player
     game_state['phase'] = 'showdown'
 
