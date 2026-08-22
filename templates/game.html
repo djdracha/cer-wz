@@ -236,12 +236,23 @@
                 </div>
             </div>
             
-            <div class="controls">
-                <button id="start-btn" class="btn btn-primary" onclick="startGame()">Rozpocznij grę</button>
-                <button id="exchange-btn" class="btn btn-success hidden" onclick="exchangeCards()">Wymień zaznaczone</button>
-                <button id="stand-btn" class="btn btn-warning hidden" onclick="stand()">Pasuj</button>
-                <button id="next-round-btn" class="btn btn-primary hidden" onclick="nextRound()">Następna runda</button>
-            </div>
+<div class="controls">
+    <button id="start-btn" class="btn btn-primary" type="button">
+        Rozpocznij grę
+    </button>
+
+    <button id="exchange-btn" class="btn btn-success hidden" type="button">
+        Wymień zaznaczone
+    </button>
+
+    <button id="stand-btn" class="btn btn-warning hidden" type="button">
+        Pasuj
+    </button>
+
+    <button id="next-round-btn" class="btn btn-primary hidden" type="button">
+        Następna runda
+    </button>
+</div>
         </div>
         
         <div class="players-list">
@@ -393,7 +404,7 @@ async function startGame() {
         console.error('Błąd podczas startu gry:', error);
         alert('Wystąpił błąd połączenia z serwerem.');
     }
-}        
+}      
         async function exchangeCards() {
             try {
                 const response = await fetch('/api/exchange_cards', {
@@ -466,6 +477,10 @@ function updatePlayersList(data) {
 }
         
         // Inicjalizacja
+        document.getElementById('start-btn').addEventListener('click', startGame);
+        document.getElementById('exchange-btn').addEventListener('click', exchangeCards);
+        document.getElementById('stand-btn').addEventListener('click', stand);
+        document.getElementById('next-round-btn').addEventListener('click', nextRound);
         updateGameState();
     </script>
 </body>
