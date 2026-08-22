@@ -374,21 +374,26 @@ if (data.phase === 'waiting') {
             renderCards(gameState.hand);
         }
         
-        async function startGame() {
-            try {
-                const response = await fetch('/api/start_game', {
-                    method: 'POST'
-                });
-                const data = await response.json();
-                if (data.status === 'success') {
-                    selectedCards = [];
-                    updateGameState();
-                }
-            } catch (error) {
-                console.error('Błąd podczas startu gry:', error);
-            }
+async function startGame() {
+    try {
+        const response = await fetch('/api/start_game', {
+            method: 'POST'
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            alert(data.message || 'Nie udało się rozpocząć gry.');
+            return;
         }
-        
+
+        selectedCards = [];
+        updateGameState();
+    } catch (error) {
+        console.error('Błąd podczas startu gry:', error);
+        alert('Wystąpił błąd połączenia z serwerem.');
+    }
+}        
         async function exchangeCards() {
             try {
                 const response = await fetch('/api/exchange_cards', {
