@@ -230,7 +230,7 @@ def evaluate_and_award():
         game_state['winner'] = best_player
     
     # Reset do nowej rundy
-    game_state['phase'] = 'waiting'
+    game_state['phase'] = 'showdown'
 
 @app.route('/api/next_round', methods=['POST'])
 @login_required
