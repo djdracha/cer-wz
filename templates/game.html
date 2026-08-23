@@ -3,510 +3,583 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Poker 5-kartowy - Gra</title>
+    <title>Poker 5-kartowy - Klasyczne kasyno</title>
     <style>
+        :root {
+            --gold: #f3c969;
+            --gold-dark: #a86d18;
+            --felt: #0a5a32;
+            --felt-dark: #063b22;
+            --wine: #651a24;
+            --cream: #fff7dc;
+            --ink: #20170d;
+        }
+
         * {
-            margin: 0;
-            padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            margin: 0;
             min-height: 100vh;
-            color: white;
+            color: var(--cream);
+            font-family: Georgia, 'Times New Roman', serif;
+            background:
+                radial-gradient(circle at 50% 0%, rgba(120, 28, 34, 0.55), transparent 35%),
+                repeating-linear-gradient(45deg, rgba(255,255,255,0.02) 0 2px, rgba(0,0,0,0.03) 2px 4px),
+                #1a0b0d;
         }
-        
+
         .header {
-            background: rgba(255,255,255,0.1);
-            padding: 20px;
+            min-height: 72px;
+            padding: 14px 28px;
             display: flex;
+            align-items: center;
             justify-content: space-between;
-            align-items: center;
+            border-bottom: 2px solid var(--gold-dark);
+            background: linear-gradient(90deg, #250b0f, #651a24, #250b0f);
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.55);
         }
-        
+
         .header h1 {
-            font-size: 24px;
+            margin: 0;
+            color: var(--gold);
+            font-size: clamp(22px, 3vw, 32px);
+            letter-spacing: 1px;
+            text-shadow: 2px 2px #28080b;
         }
-        
-        .logout-btn {
-            background: #e74c3c;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-        }
-        
-        .game-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        .status-bar {
-            background: rgba(255,255,255,0.1);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        .status-bar h2 {
-            margin-bottom: 10px;
-        }
-        
-        .points {
-            font-size: 24px;
-            color: #f1c40f;
-            margin-top: 10px;
-        }
-        
-        .cards-area {
-            background: rgba(255,255,255,0.05);
-            padding: 30px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .cards-title {
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 20px;
-        }
-        
-        .cards {
+
+        .user-box {
             display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-        
-        .card {
-            width: 100px;
-            height: 140px;
-            background: white;
-            border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
             align-items: center;
-            font-size: 24px;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            position: relative;
-            user-select: none;
+            gap: 14px;
+            font-family: Arial, sans-serif;
         }
-        
-        .card.red {
-            color: #e74c3c;
-        }
-        
-        .card.black {
-            color: #2c3e50;
-        }
-        
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 20px rgba(255,255,255,0.3);
-        }
-        
-        .card.selected {
-            transform: translateY(-15px);
-            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.5);
-            border: 3px solid #e74c3c;
-        }
-        
-        .card .rank {
-            font-size: 28px;
+
+        .logout-btn {
+            color: #fff;
+            text-decoration: none;
+            background: #a22a30;
+            padding: 10px 16px;
+            border: 1px solid #e97a72;
+            border-radius: 6px;
             font-weight: bold;
         }
-        
-        .card .suit {
-            font-size: 32px;
+
+        .logout-btn:hover {
+            background: #c13c3d;
         }
-        
+
+        .casino-room {
+            width: min(1280px, 100%);
+            margin: 0 auto;
+            padding: 22px 16px 34px;
+        }
+
+        .table-wrap {
+            position: relative;
+            width: min(1120px, 100%);
+            height: 720px;
+            margin: 0 auto;
+        }
+
+        .poker-table {
+            position: absolute;
+            inset: 95px 5% 90px;
+            border-radius: 48%;
+            background:
+                radial-gradient(ellipse at center, rgba(35, 151, 80, 0.48), transparent 58%),
+                linear-gradient(145deg, #0d7441, var(--felt-dark));
+            border: 18px solid #4a250d;
+            outline: 3px solid var(--gold-dark);
+            box-shadow:
+                inset 0 0 0 5px #1d0d04,
+                inset 0 0 45px rgba(0, 0, 0, 0.55),
+                0 18px 38px rgba(0, 0, 0, 0.7);
+        }
+
+        .poker-table::before {
+            content: 'POKER • 5 KART • GRA NA PUNKTY';
+            position: absolute;
+            left: 50%;
+            top: 43%;
+            transform: translate(-50%, -50%);
+            width: 70%;
+            text-align: center;
+            color: rgba(255, 235, 170, 0.26);
+            font-size: clamp(17px, 2.2vw, 28px);
+            font-weight: bold;
+            letter-spacing: 3px;
+        }
+
+        .table-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            z-index: 3;
+            width: min(360px, 54vw);
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .status-panel {
+            padding: 15px 18px;
+            color: var(--cream);
+            background: rgba(20, 16, 9, 0.83);
+            border: 2px solid var(--gold-dark);
+            border-radius: 12px;
+            box-shadow: 0 5px 16px rgba(0, 0, 0, 0.4);
+        }
+
+        .status-panel h2 {
+            margin: 0 0 8px;
+            font-size: clamp(18px, 2.2vw, 26px);
+        }
+
+        .points {
+            color: var(--gold);
+            font-family: Arial, sans-serif;
+            font-size: 19px;
+            font-weight: bold;
+        }
+
+        .message {
+            margin-top: 12px;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(75, 16, 19, 0.88);
+            border: 1px solid #bd7b49;
+            font-family: Arial, sans-serif;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
         .controls {
             display: flex;
             justify-content: center;
-            gap: 20px;
-            margin-top: 30px;
+            flex-wrap: wrap;
+            gap: 9px;
+            margin-top: 14px;
         }
-        
+
         .btn {
-            padding: 15px 40px;
-            font-size: 18px;
-            border: none;
-            border-radius: 5px;
+            padding: 11px 15px;
+            border: 1px solid #f4d182;
+            border-radius: 6px;
+            color: #281400;
+            font-family: Georgia, serif;
+            font-size: 16px;
+            font-weight: bold;
             cursor: pointer;
-            font-weight: 600;
-            transition: transform 0.2s;
+            box-shadow: inset 0 1px rgba(255,255,255,0.6), 0 3px 5px rgba(0,0,0,0.35);
         }
-        
+
         .btn:hover {
-            transform: translateY(-2px);
+            filter: brightness(1.12);
+            transform: translateY(-1px);
         }
-        
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        
-        .btn-success {
-            background: #27ae60;
-            color: white;
-        }
-        
-        .btn-warning {
-            background: #f39c12;
-            color: white;
-        }
-        
-        .players-list {
-            background: rgba(255,255,255,0.1);
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-        }
-        
-        .players-list h3 {
-            margin-bottom: 15px;
-        }
-        
-        .player-item {
-            padding: 10px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 5px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-        }
-        
-        .player-item.current {
-            background: rgba(241, 196, 15, 0.3);
-            border-left: 4px solid #f1c40f;
-        }
-        
-        .message {
-            background: rgba(255,255,255,0.1);
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 20px;
+
+        .btn-primary { background: linear-gradient(#f7d982, #bd7a20); }
+        .btn-success { background: linear-gradient(#dff09d, #6ca23c); }
+        .btn-warning { background: linear-gradient(#ffd68c, #d57a20); }
+
+        .seat {
+            position: absolute;
+            z-index: 4;
+            width: 150px;
+            padding: 9px 10px;
             text-align: center;
+            color: #fff9e8;
+            background: linear-gradient(145deg, #421218, #1c090b);
+            border: 2px solid #9d6b28;
+            border-radius: 14px;
+            box-shadow: 0 6px 13px rgba(0,0,0,0.55);
+            font-family: Arial, sans-serif;
+        }
+
+        .seat.current {
+            border-color: #ffe188;
+            box-shadow: 0 0 0 3px rgba(255, 209, 91, 0.30), 0 6px 13px rgba(0,0,0,0.55);
+        }
+
+        .seat.me {
+            background: linear-gradient(145deg, #7d241e, #2b0908);
+        }
+
+        .avatar {
+            width: 38px;
+            height: 38px;
+            margin: -27px auto 5px;
+            display: grid;
+            place-items: center;
+            border: 2px solid #e6bc5c;
+            border-radius: 50%;
+            background: #24100b;
+            font-size: 21px;
+        }
+
+        .seat-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-weight: bold;
+        }
+
+        .seat-points {
+            margin-top: 4px;
+            color: var(--gold);
+            font-size: 13px;
+        }
+
+        .seat-turn {
+            margin-top: 4px;
+            color: #ffeaa7;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .seat-0 { left: 50%; top: 12px; transform: translateX(-50%); }
+        .seat-1 { right: 3%; top: 25%; }
+        .seat-2 { right: 5%; bottom: 22%; }
+        .seat-3 { left: 50%; bottom: 4px; transform: translateX(-50%); }
+        .seat-4 { left: 5%; bottom: 22%; }
+        .seat-5 { left: 3%; top: 25%; }
+
+        .my-cards-area {
+            position: absolute;
+            z-index: 5;
+            left: 50%;
+            bottom: 74px;
+            width: min(560px, 90vw);
+            transform: translateX(-50%);
+            text-align: center;
+        }
+
+        .cards-title {
+            margin: 0 0 9px;
+            color: #fff3c4;
+            text-shadow: 1px 1px #1a0b03;
             font-size: 18px;
         }
-        
-        .hidden {
-            display: none;
+
+        .cards {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            width: 74px;
+            height: 106px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #d1b275;
+            border-radius: 8px;
+            background: linear-gradient(145deg, #fffef8, #e9e2cc);
+            box-shadow: 2px 4px 8px rgba(0,0,0,0.5);
+            color: #182018;
+            cursor: pointer;
+            transition: transform 0.18s, box-shadow 0.18s;
+            user-select: none;
+        }
+
+        .card:hover { transform: translateY(-8px); }
+        .card.selected {
+            transform: translateY(-17px);
+            border-color: #ffcb59;
+            box-shadow: 0 0 0 3px rgba(255, 199, 67, 0.35), 2px 6px 10px rgba(0,0,0,0.55);
+        }
+
+        .card.red { color: #bf1c28; }
+        .card.black { color: #1d2023; }
+        .rank { font-size: 25px; font-weight: bold; }
+        .suit { font-size: 30px; line-height: 30px; }
+
+        .legend {
+            margin: 5px auto 0;
+            max-width: 860px;
+            text-align: center;
+            color: #dfc891;
+            font-family: Arial, sans-serif;
+            font-size: 13px;
+        }
+
+        @media (max-width: 720px) {
+            .header { padding: 12px; }
+            .table-wrap { height: 680px; }
+            .poker-table { inset: 95px 0 80px; border-width: 12px; }
+            .seat { width: 110px; padding: 7px; font-size: 12px; }
+            .seat-1 { right: -2%; top: 26%; }
+            .seat-2 { right: 0; bottom: 24%; }
+            .seat-4 { left: 0; bottom: 24%; }
+            .seat-5 { left: -2%; top: 26%; }
+            .my-cards-area { bottom: 73px; }
+            .card { width: 55px; height: 80px; }
+            .rank { font-size: 20px; }
+            .suit { font-size: 24px; }
+            .table-center { width: 270px; }
+            .btn { padding: 9px 10px; font-size: 14px; }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>🃏 Pokój 5-kartonowy</h1>
-        <div>
-            <span id="current-user">{{ username }}</span>
+    <header class="header">
+        <h1>🃏 Poker 5-kartowy</h1>
+        <div class="user-box">
+            <span>{{ username }}</span>
             <a href="/logout" class="logout-btn">Wyloguj</a>
         </div>
-    </div>
-    
-    <div class="game-container">
-        <div class="status-bar">
-            <h2 id="phase-text">Oczekiwanie na rozpoczęcie </h2>
-            <div class="points">Twoje punkty: <span id="player-points">1</span></div>
-        </div>
-        
-        <div id="start-message" class="message">
-            Kliknij "Rozpocznij", aby zacząć nową rundę
-        </div>
-        
-        <div id="game-area">
-            <div class="cards-area">
-                <div class="cards-title">Twoje karty</div>
-                <div class="cards" id="player-cards">
-                    <!-- Karty będą tutaj -->
+    </header>
+
+    <main class="casino-room">
+        <div class="table-wrap">
+            <div class="poker-table"></div>
+
+            <section class="table-center">
+                <div class="status-panel">
+                    <h2 id="phase-text">Oczekiwanie na rozpoczęcie gry</h2>
+                    <div class="points">Twoje punkty: <span id="player-points">100</span></div>
                 </div>
-            </div>
-            
-<div class="controls">
-    <button id="start-btn" class="btn btn-primary" type="button">
-        Rozpocznij grę
-    </button>
 
-    <button id="exchange-btn" class="btn btn-success hidden" type="button">
-        Wymień zaznaczone
-    </button>
+                <div id="start-message" class="message">
+                    Zaloguj co najmniej dwóch graczy, a następnie rozpocznij rundę.
+                </div>
 
-    <button id="stand-btn" class="btn btn-warning hidden" type="button">
-        Pasuj
-    </button>
+                <div id="winner-message" class="message hidden"></div>
 
-    <button id="next-round-btn" class="btn btn-primary hidden" type="button">
-        Następna runda
-    </button>
-</div>
+                <div class="controls">
+                    <button id="start-btn" class="btn btn-primary" type="button">Rozpocznij grę</button>
+                    <button id="exchange-btn" class="btn btn-success hidden" type="button">Wymień zaznaczone</button>
+                    <button id="stand-btn" class="btn btn-warning hidden" type="button">Zostaw karty</button>
+                    <button id="next-round-btn" class="btn btn-primary hidden" type="button">Następna runda</button>
+                </div>
+            </section>
+
+            <section id="seats-container" aria-label="Miejsca graczy przy stole"></section>
+
+            <section class="my-cards-area">
+                <h3 class="cards-title">Twoje karty</h3>
+                <div id="player-cards" class="cards"></div>
+            </section>
         </div>
-        
-        <div class="players-list">
-            <h3>Gracze</h3>
-            <div id="players-container">
-                <!-- Lista graczy -->
-            </div>
-        </div>
-        
-        <div id="winner-message" class="message hidden"></div>
-    </div>
-    
+
+        <p class="legend">Złota ramka oznacza gracza, którego jest kolej. Kliknij własne karty, aby zaznaczyć je do wymiany.</p>
+    </main>
+
     <script>
-    let selectedCards = [];
-    let gameState = {};
+        let selectedCards = [];
+        let gameState = {};
 
-    setInterval(updateGameState, 2000);
+        const seatsContainer = document.getElementById('seats-container');
+        const phaseText = document.getElementById('phase-text');
+        const playerPoints = document.getElementById('player-points');
+        const startMessage = document.getElementById('start-message');
+        const winnerMessage = document.getElementById('winner-message');
+        const startButton = document.getElementById('start-btn');
+        const exchangeButton = document.getElementById('exchange-btn');
+        const standButton = document.getElementById('stand-btn');
+        const nextRoundButton = document.getElementById('next-round-btn');
 
-    async function updateGameState() {
-        try {
-            const response = await fetch('/api/get_state');
-            const data = await response.json();
-
-            gameState = data;
-
-            document.getElementById('player-points').textContent = data.points;
-
-            const phaseText = document.getElementById('phase-text');
-            const startMsg = document.getElementById('start-message');
-            const gameArea = document.getElementById('game-area');
-            const startBtn = document.getElementById('start-btn');
-            const exchangeBtn = document.getElementById('exchange-btn');
-            const standBtn = document.getElementById('stand-btn');
-            const nextRoundBtn = document.getElementById('next-round-btn');
-            const winnerMessage = document.getElementById('winner-message');
-
-            if (data.phase === 'waiting') {
-                phaseText.textContent = 'Oczekiwanie na rozpoczęcie gry';
-                startMsg.classList.remove('hidden');
-                gameArea.classList.remove('hidden');
-                startBtn.classList.remove('hidden');
-                exchangeBtn.classList.add('hidden');
-                standBtn.classList.add('hidden');
-                nextRoundBtn.classList.add('hidden');
-                winnerMessage.classList.add('hidden');
-            } else {
-                startMsg.classList.add('hidden');
-                gameArea.classList.remove('hidden');
-                startBtn.classList.add('hidden');
-
-                if (data.phase === 'dealing') {
-                    phaseText.textContent = 'Rozdawanie kart...';
-                    exchangeBtn.classList.add('hidden');
-                    standBtn.classList.add('hidden');
-                    nextRoundBtn.classList.add('hidden');
-                } else if (data.phase === 'exchange') {
-                    nextRoundBtn.classList.add('hidden');
-                    winnerMessage.classList.add('hidden');
-
-                    if (data.current_player === data.username) {
-                        phaseText.textContent = 'Twoja kolej! Wybierz karty do wymiany';
-                        exchangeBtn.classList.remove('hidden');
-                        standBtn.classList.remove('hidden');
-                    } else {
-                        phaseText.textContent = `Kolej gracza: ${data.current_player}`;
-                        exchangeBtn.classList.add('hidden');
-                        standBtn.classList.add('hidden');
-                    }
-                } else if (data.phase === 'showdown') {
-                    phaseText.textContent = 'Koniec rundy!';
-                    exchangeBtn.classList.add('hidden');
-                    standBtn.classList.add('hidden');
-                    nextRoundBtn.classList.remove('hidden');
-
-                    if (data.winner) {
-                        winnerMessage.textContent =
-                            `Zwycięzca rundy: ${data.winner}. Otrzymuje 1 pkt!`;
-                    } else {
-                        winnerMessage.textContent = 'Runda zakończona.';
-                    }
-
-                    winnerMessage.classList.remove('hidden');
-                }
-            }
-
-            if (data.hand && data.hand.length > 0) {
-                renderCards(data.hand);
-            }
-
-            updatePlayersList(data);
-
-        } catch (error) {
-            console.error('Błąd podczas pobierania stanu gry:', error);
+        function setHidden(element, hidden) {
+            element.classList.toggle('hidden', hidden);
         }
-    }
 
-    function renderCards(hand) {
-        const container = document.getElementById('player-cards');
-        container.innerHTML = '';
+        async function updateGameState() {
+            try {
+                const response = await fetch('/api/get_state');
+                if (!response.ok) {
+                    return;
+                }
 
-        hand.forEach((card, index) => {
-            const cardEl = document.createElement('div');
-            const isRed = card.suit === '♥' || card.suit === '♦';
+                const data = await response.json();
+                gameState = data;
+                playerPoints.textContent = data.points ?? 100;
 
-            cardEl.className = `card ${isRed ? 'red' : 'black'}`;
+                renderSeats(data);
+                renderCards(data.hand || []);
+                updateInterface(data);
+            } catch (error) {
+                console.error('Błąd podczas pobierania stanu gry:', error);
+            }
+        }
+
+        function updateInterface(data) {
+            const phase = data.phase || 'waiting';
+            const isMyTurn = data.current_player === data.username;
+
+            setHidden(startButton, phase !== 'waiting');
+            setHidden(exchangeButton, !(phase === 'exchange' && isMyTurn));
+            setHidden(standButton, !(phase === 'exchange' && isMyTurn));
+            setHidden(nextRoundButton, phase !== 'showdown');
+
+            if (phase === 'waiting') {
+                phaseText.textContent = 'Oczekiwanie na rozpoczęcie gry';
+                setHidden(startMessage, false);
+                setHidden(winnerMessage, true);
+            } else if (phase === 'dealing') {
+                phaseText.textContent = 'Rozdawanie kart...';
+                setHidden(startMessage, true);
+                setHidden(winnerMessage, true);
+            } else if (phase === 'exchange') {
+                phaseText.textContent = isMyTurn
+                    ? 'Twoja kolej — wybierz karty do wymiany'
+                    : `Kolej gracza: ${data.current_player}`;
+                setHidden(startMessage, true);
+                setHidden(winnerMessage, true);
+            } else if (phase === 'showdown') {
+                phaseText.textContent = 'Koniec rundy';
+                setHidden(startMessage, true);
+                winnerMessage.textContent = data.winner
+                    ? `Zwycięzca rundy: ${data.winner}. Otrzymuje 50 pkt!`
+                    : 'Runda zakończona.';
+                setHidden(winnerMessage, false);
+            }
+        }
+
+        function renderSeats(data) {
+            seatsContainer.innerHTML = '';
+            const entries = Object.entries(data.players || {}).slice(0, 6);
+
+            entries.forEach(([name, playerData], index) => {
+                const seat = document.createElement('article');
+                seat.className = `seat seat-${index}`;
+
+                if (name === data.current_player) {
+                    seat.classList.add('current');
+                }
+                if (name === data.username) {
+                    seat.classList.add('me');
+                }
+
+                const turnText = name === data.current_player ? '● TWOJA KOLEJ' : '';
+                const ownText = name === data.username ? ' (Ty)' : '';
+
+                seat.innerHTML = `
+                    <div class="avatar">♠</div>
+                    <div class="seat-name">${name}${ownText}</div>
+                    <div class="seat-points">${playerData.points ?? 100} pkt</div>
+                    <div class="seat-turn">${turnText}</div>
+                `;
+
+                seatsContainer.appendChild(seat);
+            });
+        }
+
+        function renderCards(hand) {
+            const container = document.getElementById('player-cards');
+            container.innerHTML = '';
+
+            hand.forEach((card, index) => {
+                const cardElement = document.createElement('button');
+                const isRed = card.suit === '♥' || card.suit === '♦';
+
+                cardElement.type = 'button';
+                cardElement.className = `card ${isRed ? 'red' : 'black'}`;
+                cardElement.setAttribute('aria-label', `${card.rank} ${card.suit}`);
+
+                if (selectedCards.includes(index)) {
+                    cardElement.classList.add('selected');
+                }
+
+                cardElement.innerHTML = `
+                    <span class="rank">${card.rank}</span>
+                    <span class="suit">${card.suit}</span>
+                `;
+
+                cardElement.addEventListener('click', () => toggleCard(index));
+                container.appendChild(cardElement);
+            });
+        }
+
+        function toggleCard(index) {
+            if (gameState.phase !== 'exchange' || gameState.current_player !== gameState.username) {
+                return;
+            }
 
             if (selectedCards.includes(index)) {
-                cardEl.classList.add('selected');
+                selectedCards = selectedCards.filter(cardIndex => cardIndex !== index);
+            } else {
+                selectedCards.push(index);
             }
 
-            cardEl.innerHTML = `
-                <div class="rank">${card.rank}</div>
-                <div class="suit">${card.suit}</div>
-            `;
-
-            cardEl.addEventListener('click', () => toggleCard(index));
-            container.appendChild(cardEl);
-        });
-    }
-
-    function toggleCard(index) {
-        if (
-            gameState.phase !== 'exchange' ||
-            gameState.current_player !== gameState.username
-        ) {
-            return;
+            renderCards(gameState.hand || []);
         }
 
-        if (selectedCards.includes(index)) {
-            selectedCards = selectedCards.filter(cardIndex => cardIndex !== index);
-        } else {
-            selectedCards.push(index);
-        }
+        async function requestGameAction(url, payload = null) {
+            const options = { method: 'POST' };
 
-        renderCards(gameState.hand);
-    }
+            if (payload !== null) {
+                options.headers = { 'Content-Type': 'application/json' };
+                options.body = JSON.stringify(payload);
+            }
 
-    async function startGame() {
-        try {
-            const response = await fetch('/api/start_game', {
-                method: 'POST'
-            });
-
+            const response = await fetch(url, options);
             const data = await response.json();
 
             if (!response.ok) {
-                alert(data.message || 'Nie udało się rozpocząć gry.');
-                return;
+                alert(data.message || 'Nie udało się wykonać akcji.');
+                return false;
             }
 
-            selectedCards = [];
-            await updateGameState();
-
-        } catch (error) {
-            console.error('Błąd podczas rozpoczęcia gry:', error);
-            alert('Wystąpił błąd połączenia z serwerem.');
+            return true;
         }
-    }
 
-    async function exchangeCards() {
-        try {
-            const response = await fetch('/api/exchange_cards', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    cards: selectedCards
-                })
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                alert(data.message || 'Nie udało się wymienić kart.');
-                return;
+        async function startGame() {
+            try {
+                if (await requestGameAction('/api/start_game')) {
+                    selectedCards = [];
+                    await updateGameState();
+                }
+            } catch (error) {
+                console.error('Błąd podczas rozpoczęcia gry:', error);
+                alert('Wystąpił błąd połączenia z serwerem.');
             }
-
-            selectedCards = [];
-            await updateGameState();
-
-        } catch (error) {
-            console.error('Błąd podczas wymiany kart:', error);
         }
-    }
 
-    async function stand() {
-        try {
-            const response = await fetch('/api/stand', {
-                method: 'POST'
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                alert(data.message || 'Nie udało się zakończyć tury.');
-                return;
+        async function exchangeCards() {
+            try {
+                if (await requestGameAction('/api/exchange_cards', { cards: selectedCards })) {
+                    selectedCards = [];
+                    await updateGameState();
+                }
+            } catch (error) {
+                console.error('Błąd podczas wymiany kart:', error);
             }
-
-            await updateGameState();
-
-        } catch (error) {
-            console.error('Błąd podczas pasowania:', error);
         }
-    }
 
-    async function nextRound() {
-        try {
-            const response = await fetch('/api/next_round', {
-                method: 'POST'
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                alert(data.message || 'Nie udało się rozpocząć kolejnej rundy.');
-                return;
+        async function stand() {
+            try {
+                if (await requestGameAction('/api/stand')) {
+                    await updateGameState();
+                }
+            } catch (error) {
+                console.error('Błąd podczas kończenia tury:', error);
             }
-
-            selectedCards = [];
-            await updateGameState();
-
-        } catch (error) {
-            console.error('Błąd podczas rozpoczęcia nowej rundy:', error);
         }
-    }
 
-    function updatePlayersList(data) {
-        const container = document.getElementById('players-container');
-        container.innerHTML = '';
-
-        for (const [player, playerData] of Object.entries(data.players)) {
-            const playerEl = document.createElement('div');
-            playerEl.className = 'player-item';
-
-            if (player === data.current_player) {
-                playerEl.classList.add('current');
+        async function nextRound() {
+            try {
+                if (await requestGameAction('/api/next_round')) {
+                    selectedCards = [];
+                    await updateGameState();
+                }
+            } catch (error) {
+                console.error('Błąd podczas uruchamiania nowej rundy:', error);
             }
-
-            playerEl.innerHTML = `
-                <span>${player}</span>
-                <span>${playerData.points} pkt</span>
-            `;
-
-            container.appendChild(playerEl);
         }
-    }
 
-    document.getElementById('start-btn').addEventListener('click', startGame);
-    document.getElementById('exchange-btn').addEventListener('click', exchangeCards);
-    document.getElementById('stand-btn').addEventListener('click', stand);
-    document.getElementById('next-round-btn').addEventListener('click', nextRound);
+        startButton.addEventListener('click', startGame);
+        exchangeButton.addEventListener('click', exchangeCards);
+        standButton.addEventListener('click', stand);
+        nextRoundButton.addEventListener('click', nextRound);
 
-    updateGameState();
-</script>
+        updateGameState();
+        setInterval(updateGameState, 2000);
+    </script>
 </body>
 </html>
