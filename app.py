@@ -7,12 +7,12 @@ app.secret_key = 'twoj_tajny_klucz_do_projektu'  # Zmień na własny klucz
 
 # Dostępni użytkownicy (maksymalnie 6)
 USERS = {
-    'gracz1': 'haslo1',
-    'gracz2': 'haslo2',
-    'gracz3': 'haslo3',
-    'gracz4': 'haslo4',
-    'gracz5': 'haslo5',
-    'gracz6': 'haslo6'
+    'ms': 'haslo1',
+    'kb': 'haslo2',
+    'gs': 'haslo3',
+    'kk': 'haslo4',
+    'rp': 'haslo5',
+    'xd': 'haslo6'
 }
 
 # Stan gry
