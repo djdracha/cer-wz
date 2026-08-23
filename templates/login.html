@@ -3,153 +3,322 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pokój 5-kartonowy - Logowanie</title>
+    <title>Poker 5-kartowy - Logowanie</title>
     <style>
+        :root {
+            --gold: #f3c969;
+            --gold-light: #ffe89a;
+            --gold-dark: #9a681d;
+            --navy: #0b1624;
+            --navy-light: #142538;
+            --cream: #fff8e2;
+            --red: #8f242b;
+        }
+
         * {
-            margin: 0;
-            padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            margin: 0;
+            color: var(--cream);
+            font-family: Georgia, 'Times New Roman', serif;
+            background:
+                radial-gradient(circle at 50% 30%, rgba(40, 70, 98, 0.48), transparent 45%),
+                linear-gradient(135deg, #070f19 0%, #142538 50%, #08111d 100%);
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0.22;
+            background: repeating-linear-gradient(
+                45deg,
+                rgba(255,255,255,0.025) 0 2px,
+                rgba(0,0,0,0.04) 2px 5px
+            );
+        }
+
+        .header {
+            position: relative;
+            z-index: 1;
+            width: min(1340px, calc(100% - 48px));
+            min-height: 88px;
+            margin: 0 auto;
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(243, 201, 105, 0.38);
         }
-        
-        .login-container {
-            background: white;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            width: 100%;
-            max-width: 400px;
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--gold);
+            font-size: clamp(24px, 3vw, 34px);
+            font-weight: bold;
+            letter-spacing: 0.5px;
         }
-        
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 28px;
+
+        .brand-suit {
+            font-size: 35px;
+            line-height: 1;
         }
-        
-        .subtitle {
-            text-align: center;
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #333;
-            font-weight: 500;
-        }
-        
-        input[type="text"],
-        input[type="password"] {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 5px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-        
-        input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
-        .btn {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-        }
-        
-        .error {
-            background: #fee;
-            color: #c00;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        .info {
-            background: #eef;
-            color: #33a;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 20px;
+
+        .header-badges {
+            display: flex;
+            gap: 10px;
+            font-family: Arial, sans-serif;
             font-size: 13px;
         }
-        
-        .info h3 {
-            margin-bottom: 10px;
+
+        .badge {
+            padding: 9px 14px;
+            border: 1px solid rgba(243, 201, 105, 0.58);
+            border-radius: 20px;
+            color: var(--cream);
+            background: rgba(9, 17, 28, 0.38);
+        }
+
+        .main {
+            position: relative;
+            z-index: 1;
+            min-height: calc(100vh - 89px);
+            display: grid;
+            place-items: center;
+            padding: 34px 18px 50px;
+        }
+
+        .login-card {
+            width: min(430px, 100%);
+            padding: 34px 30px 28px;
+            border: 1px solid rgba(243, 201, 105, 0.72);
+            border-radius: 18px;
+            background: linear-gradient(145deg, rgba(20, 37, 56, 0.96), rgba(8, 19, 31, 0.98));
+            box-shadow: 0 20px 55px rgba(0, 0, 0, 0.52), inset 0 1px rgba(255,255,255,0.06);
+        }
+
+        .suits {
+            display: flex;
+            justify-content: center;
+            gap: 22px;
+            margin-bottom: 13px;
+            color: var(--gold);
+            font-size: 27px;
+        }
+
+        h1 {
+            margin: 0;
+            text-align: center;
+            color: var(--gold-light);
+            font-size: 27px;
+        }
+
+        .subtitle {
+            margin: 10px 0 27px;
+            color: #d6d7d6;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            font-size: 15px;
+            line-height: 1.45;
+        }
+
+        .error {
+            margin-bottom: 17px;
+            padding: 11px 13px;
+            border: 1px solid #df7770;
+            border-radius: 7px;
+            color: #ffe8df;
+            background: rgba(142, 34, 40, 0.55);
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            color: var(--gold-light);
+            font-family: Arial, sans-serif;
             font-size: 14px;
         }
-        
-        .info ul {
-            margin-left: 20px;
+
+        input {
+            width: 100%;
+            height: 47px;
+            padding: 0 14px;
+            border: 1px solid #9b9a91;
+            border-radius: 8px;
+            outline: none;
+            color: #202327;
+            background: #fbf8ef;
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+        }
+
+        input:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(243, 201, 105, 0.18);
+        }
+
+        .login-button {
+            width: 100%;
+            height: 48px;
+            margin-top: 3px;
+            border: 1px solid #ffe08a;
+            border-radius: 8px;
+            color: #241607;
+            background: linear-gradient(180deg, #ffdd71, #e4a62e);
+            box-shadow: inset 0 1px rgba(255,255,255,0.65), 0 5px 10px rgba(0,0,0,0.32);
+            cursor: pointer;
+            font-family: Georgia, serif;
+            font-size: 17px;
+            font-weight: bold;
+        }
+
+        .login-button:hover {
+            filter: brightness(1.09);
+            transform: translateY(-1px);
+        }
+
+        .accounts {
+            margin-top: 28px;
+            padding: 14px;
+            border-radius: 9px;
+            background: rgba(4, 12, 21, 0.7);
+            font-family: Arial, sans-serif;
+        }
+
+        .accounts-title {
+            margin-bottom: 8px;
+            color: var(--gold);
+            font-weight: bold;
+        }
+
+        .account-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px 22px;
+            color: #e8e8e5;
+            font-size: 14px;
+            line-height: 1.35;
+        }
+
+        .hint {
+            margin: 17px 0 0;
+            color: #aeb8c2;
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        @media (max-width: 650px) {
+            .header {
+                width: calc(100% - 26px);
+                min-height: 70px;
+            }
+
+            .brand {
+                font-size: 22px;
+            }
+
+            .brand-suit {
+                font-size: 27px;
+            }
+
+            .header-badges {
+                display: none;
+            }
+
+            .main {
+                min-height: calc(100vh - 71px);
+                padding-top: 22px;
+            }
+
+            .login-card {
+                padding: 28px 21px 23px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <h1>🃏 Pokój 5-kartonowy</h1>
-        <p class="subtitle">Gra na punkty dla maksymalnie 6 graczy</p>
-        
-        {% if error %}
-        <div class="error">{{ error }}</div>
-        {% endif %}
-        
-        <form method="POST">
-            <div class="form-group">
-                <label for="username">Nazwa użytkownika</label>
-                <input type="text" id="username" name="username" required 
-                       placeholder="np. gracz1">
-            </div>
-            
-            <div class="form-group">
-                <label for="password">Haslo</label>
-                <input type="password" id="password" name="password" required 
-                       placeholder="Wprowadz haslo">
-            </div>
-            
-            <button type="submit" class="btn">Zaloguj się</button>
-        </form>
-        
-        <div class="info">
-            <h3>Dostępni użytkownicy:</h3>
-            <ul>
-                <li>gracz1 / haslo1</li>
-                <li>gracz2 / haslo2</li>
-                <li>gracz3 / haslo3</li>
-                <li>gracz4 / haslo4</li>
-                <li>gracz5 / haslo5</li>
-                <li>gracz6 / haslo6</li>
-            </ul>
+    <header class="header">
+        <div class="brand">
+            <span class="brand-suit">♠</span>
+            <span>Poker 5-kartowy</span>
         </div>
-    </div>
+
+        <div class="header-badges">
+            <span class="badge">Gra na punkty</span>
+            <span class="badge">Maks. 6 graczy</span>
+        </div>
+    </header>
+
+    <main class="main">
+        <section class="login-card">
+            <div class="suits" aria-hidden="true">
+                <span>♠</span>
+                <span>♥</span>
+                <span>♦</span>
+                <span>♣</span>
+            </div>
+
+            <h1>Wejdź do stołu</h1>
+            <p class="subtitle">Wybierz jedno z przygotowanych kont gracza.</p>
+
+            {% if error %}
+            <div class="error">{{ error }}</div>
+            {% endif %}
+
+            <form method="POST">
+                <div class="form-group">
+                    <label for="username">Login</label>
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        placeholder="np. gracz1"
+                        autocomplete="username"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Hasło</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Hasło"
+                        autocomplete="current-password"
+                        required
+                    >
+                </div>
+
+                <button class="login-button" type="submit">Zaloguj się do stołu</button>
+            </form>
+
+            <div class="accounts">
+                <div class="accounts-title">Gotowe konta</div>
+                <div class="account-grid">
+                    <span>gracz1 / haslo1</span>
+                    <span>gracz2 / haslo2</span>
+                    <span>gracz3 / haslo3</span>
+                    <span>gracz4 / haslo4</span>
+                    <span>gracz5 / haslo5</span>
+                    <span>gracz6 / haslo6</span>
+                </div>
+            </div>
+
+            <p class="hint">Gra demonstracyjna — rozgrywka odbywa się wyłącznie na punkty.</p>
+        </section>
+    </main>
 </body>
 </html>
