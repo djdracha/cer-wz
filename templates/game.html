@@ -490,6 +490,298 @@
     font-family: Georgia, serif;
     font-weight: bold;
 }
+        html {
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+.casino-room {
+    width: min(1280px, 100%);
+    padding: clamp(10px, 2vw, 22px) clamp(8px, 2vw, 16px) 28px;
+}
+
+.table-wrap {
+    width: min(1120px, 100%);
+    height: clamp(560px, 68vw, 720px);
+}
+
+.poker-table {
+    inset: 13% 4% 12%;
+    border-width: clamp(10px, 1.7vw, 18px);
+}
+
+.table-center {
+    width: min(360px, 62vw);
+}
+
+.status-panel {
+    padding: clamp(10px, 1.8vw, 15px) clamp(12px, 2vw, 18px);
+}
+
+.my-cards-area {
+    bottom: 9%;
+    width: min(560px, 92vw);
+}
+
+.card {
+    width: clamp(48px, 7vw, 74px);
+    height: clamp(70px, 10vw, 106px);
+}
+
+.rank {
+    font-size: clamp(17px, 2.3vw, 25px);
+}
+
+.suit {
+    font-size: clamp(21px, 2.8vw, 30px);
+    line-height: 1;
+}
+
+.seat {
+    width: clamp(86px, 14vw, 150px);
+    padding: clamp(5px, 1vw, 9px);
+    border-radius: clamp(9px, 1.4vw, 14px);
+}
+
+.seat-name {
+    font-size: clamp(10px, 1.5vw, 14px);
+}
+
+.seat-points,
+.seat-turn {
+    font-size: clamp(9px, 1.2vw, 13px);
+}
+
+.avatar {
+    width: clamp(28px, 3.7vw, 38px);
+    height: clamp(28px, 3.7vw, 38px);
+    margin-top: clamp(-22px, -2.5vw, -27px);
+    font-size: clamp(15px, 2vw, 21px);
+}
+
+.controls {
+    gap: 7px;
+}
+
+.btn {
+    padding: clamp(8px, 1.2vw, 11px) clamp(9px, 1.5vw, 15px);
+    font-size: clamp(12px, 1.5vw, 16px);
+}
+
+.showdown-panel,
+.chat-panel {
+    width: min(1120px, 100%);
+}
+
+@media (max-width: 700px) {
+    .header {
+        min-height: 58px;
+        padding: 10px 12px;
+    }
+
+    .header h1 {
+        font-size: 20px;
+    }
+
+    .user-box {
+        gap: 7px;
+        font-size: 12px;
+    }
+
+    .logout-btn {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+
+    .table-wrap {
+        height: 570px;
+    }
+
+    .poker-table {
+        inset: 13% 0 11%;
+        border-width: 10px;
+    }
+
+    .poker-table::before {
+        top: 38%;
+        width: 62%;
+        font-size: 12px;
+        letter-spacing: 1px;
+    }
+
+    .table-center {
+        width: min(255px, 64vw);
+    }
+
+    .status-panel h2 {
+        font-size: 15px;
+    }
+
+    .points {
+        font-size: 14px;
+    }
+
+    .message {
+        margin-top: 7px;
+        padding: 7px;
+        font-size: 12px;
+    }
+
+    .seat {
+        width: 78px;
+        padding: 5px 4px;
+        border-width: 1px;
+    }
+
+    .seat-0 { top: 4px; }
+    .seat-1 { right: -1.5%; top: 24%; }
+    .seat-2 { right: -1.5%; bottom: 23%; }
+    .seat-3 { bottom: 0; }
+    .seat-4 { left: -1.5%; bottom: 23%; }
+    .seat-5 { left: -1.5%; top: 24%; }
+
+    .avatar {
+        width: 25px;
+        height: 25px;
+        margin: -17px auto 3px;
+        border-width: 1px;
+        font-size: 14px;
+    }
+
+    .seat-name {
+        font-size: 9px;
+    }
+
+    .seat-points,
+    .seat-turn {
+        margin-top: 2px;
+        font-size: 8px;
+    }
+
+    .my-cards-area {
+        bottom: 7%;
+    }
+
+    .cards-title {
+        margin-bottom: 5px;
+        font-size: 13px;
+    }
+
+    .cards {
+        gap: 4px;
+        flex-wrap: nowrap;
+    }
+
+    .card {
+        width: min(15vw, 56px);
+        height: min(21.5vw, 79px);
+        border-width: 1px;
+        border-radius: 5px;
+    }
+
+    .card.selected {
+        transform: translateY(-10px);
+    }
+
+    .rank {
+        font-size: 17px;
+    }
+
+    .suit {
+        font-size: 20px;
+    }
+
+    .controls {
+        gap: 4px;
+        margin-top: 8px;
+    }
+
+    .btn {
+        padding: 7px 7px;
+        font-size: 11px;
+    }
+
+    .legend {
+        padding: 0 9px;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+
+    .showdown-panel {
+        padding: 12px 9px;
+    }
+
+    .showdown-grid {
+        grid-template-columns: 1fr;
+        gap: 9px;
+    }
+
+    .showdown-card {
+        width: 34px;
+        height: 48px;
+    }
+
+    .chat-panel {
+        margin-bottom: 14px;
+    }
+
+    .chat-messages {
+        height: 145px;
+    }
+}
+
+@media (max-width: 390px) {
+    .header h1 {
+        font-size: 17px;
+    }
+
+    .user-box > span {
+        display: none;
+    }
+
+    .table-wrap {
+        height: 520px;
+    }
+
+    .table-center {
+        width: 235px;
+    }
+
+    .seat {
+        width: 68px;
+    }
+
+    .seat-1,
+    .seat-2 {
+        right: -3%;
+    }
+
+    .seat-4,
+    .seat-5 {
+        left: -3%;
+    }
+
+    .seat-name {
+        font-size: 8px;
+    }
+
+    .seat-points,
+    .seat-turn {
+        font-size: 7px;
+    }
+
+    .my-cards-area {
+        width: 98vw;
+    }
+
+    .btn {
+        padding: 6px 5px;
+        font-size: 10px;
+    }
+}
     </style>
 </head>
 <body>
