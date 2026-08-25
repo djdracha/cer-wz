@@ -26,7 +26,8 @@ game_state = {
     'players': {},
     'current_player': None,
     'phase': 'waiting',
-    'winner': None
+    'winner': None,
+    'chat_messages': []
 }
 
 
@@ -198,6 +199,41 @@ def logout():
 def game():
     return render_template('game.html', username=session['username'])
 
+@app.route('/api/chat', methods=['GET'])
+@login_required
+def get_chat():
+    return jsonify({
+        'messages': game_state.get('chat_messages', [])
+    })
+
+
+@app.route('/api/chat', methods=['POST'])
+@login_required
+def send_chat_message():
+    data = request.get_json(silent=True) or {}
+    text = str(data.get('text', '')).strip()
+
+    if not text:
+        return jsonify({
+            'status': 'error',
+            'message': 'Wiadomość nie może być pusta.'
+        }), 400
+
+    if len(text) > 180:
+        return jsonify({
+            'status': 'error',
+            'message': 'Wiadomość może mieć maksymalnie 180 znaków.'
+        }), 400
+
+    game_state['chat_messages'].append({
+        'user': session['username'],
+        'text': text
+    })
+
+    # Zostawiamy tylko 50 ostatnich wiadomości.
+    game_state['chat_messages'] = game_state['chat_messages'][-50:]
+
+    return jsonify({'status': 'success'})
 
 @app.route('/api/start_game', methods=['POST'])
 @login_required
