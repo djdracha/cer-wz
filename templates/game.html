@@ -410,7 +410,11 @@
 .showdown-card .show-suit {
     font-size: 20px;
 }
-        
+       .btn-reset {
+            color: #fff;
+            background: linear-gradient(#c64545, #7a171d);
+            border-color: #f09882;
+        } 
     </style>
 </head>
 <body>
@@ -443,6 +447,7 @@
                     <button id="exchange-btn" class="btn btn-success hidden" type="button">Wymień zaznaczone</button>
                     <button id="stand-btn" class="btn btn-warning hidden" type="button">Zostaw karty</button>
                     <button id="next-round-btn" class="btn btn-primary hidden" type="button">Następna runda</button>
+                    <button id="reset-points-btn" class="btn btn-reset hidden" type="button">Reset punktów</button>
                 </div>
             </section>
 
@@ -473,7 +478,8 @@
         const exchangeButton = document.getElementById('exchange-btn');
         const standButton = document.getElementById('stand-btn');
         const nextRoundButton = document.getElementById('next-round-btn');
-
+        const resetPointsButton = document.getElementById('reset-points-btn');
+        
         function setHidden(element, hidden) {
             element.classList.toggle('hidden', hidden);
         }
@@ -506,7 +512,8 @@
             setHidden(exchangeButton, !(phase === 'exchange' && isMyTurn));
             setHidden(standButton, !(phase === 'exchange' && isMyTurn));
             setHidden(nextRoundButton, phase !== 'showdown');
-
+            setHidden(resetPointsButton, data.username !== 'ms' || phase === 'exchange');
+            
             if (phase === 'waiting') {
                 phaseText.textContent = 'Oczekiwanie na rozpoczęcie gry';
                 setHidden(startMessage, false);
@@ -703,12 +710,31 @@
         grid.appendChild(box);
     }
 }
-        
+        async function resetPoints() {
+    const accepted = confirm(
+        'Czy na pewno wyzerować punkty wszystkich graczy i zakończyć bieżącą grę?'
+    );
+
+    if (!accepted) {
+        return;
+    }
+
+    try {
+        if (await requestGameAction('/api/reset_points')) {
+            selectedCards = [];
+            await updateGameState();
+            alert('Punkty wszystkich graczy zostały wyzerowane.');
+        }
+    } catch (error) {
+        console.error('Błąd podczas resetowania punktów:', error);
+        alert('Nie udało się zresetować punktów.');
+    }
+}
         startButton.addEventListener('click', startGame);
         exchangeButton.addEventListener('click', exchangeCards);
         standButton.addEventListener('click', stand);
         nextRoundButton.addEventListener('click', nextRound);
-
+        resetPointsButton.addEventListener('click', resetPoints);
         updateGameState();
         setInterval(updateGameState, 2000);
     </script>
