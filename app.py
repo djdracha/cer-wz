@@ -149,21 +149,31 @@ def start_game():
 
 @app.route('/api/get_state')
 @login_required
+@app.route('/api/get_state')
+@login_required
 def get_state():
     username = session['username']
-
     players_data = {}
 
     for player, data in game_state['players'].items():
-        players_data[player] = {
-            'points': data.get('points', 1),
+        player_info = {
+            'points': data.get('points', 100),
             'active': data.get('active', True)
         }
+
+        # Karty są ujawniane każdemu dopiero po zakończeniu rundy.
+        if game_state.get('phase') == 'showdown':
+            hand = data.get('hand', [])
+            player_info['hand'] = hand
+            player_info['hand_name'] = hand_name(hand) if len(hand) == 5 else ''
+            player_info['score'] = evaluate_hand(hand) if len(hand) == 5 else 0
+
+        players_data[player] = player_info
 
     return jsonify({
         'username': username,
         'hand': game_state['players'].get(username, {}).get('hand', []),
-        'points': game_state['players'].get(username, {}).get('points', 1),
+        'points': game_state['players'].get(username, {}).get('points', 100),
         'phase': game_state.get('phase', 'waiting'),
         'current_player': game_state.get('current_player'),
         'players': players_data,
@@ -209,6 +219,44 @@ def exchange_cards():
         evaluate_and_award()
     
     return jsonify({'status': 'success'})
+
+def hand_name(cards):
+    ranks = [card['rank'] for card in cards]
+    suits = [card['suit'] for card in cards]
+
+    values_map = {
+        '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7,
+        '8': 8, '9': 9, '10': 10, 'J': 11, 'Q': 12,
+        'K': 13, 'A': 14
+    }
+    values = sorted([values_map[rank] for rank in ranks])
+    counts = sorted([ranks.count(rank) for rank in set(ranks)], reverse=True)
+
+    is_flush = len(set(suits)) == 1
+    is_wheel = values == [2, 3, 4, 5, 14]
+    is_straight = len(set(values)) == 5 and (
+        max(values) - min(values) == 4 or is_wheel
+    )
+
+    if is_straight and is_flush:
+        if values == [10, 11, 12, 13, 14]:
+            return 'Poker królewski'
+        return 'Strit w kolorze'
+    if counts == [4, 1]:
+        return 'Kareta'
+    if counts == [3, 2]:
+        return 'Full'
+    if is_flush:
+        return 'Kolor'
+    if is_straight:
+        return 'Strit'
+    if counts == [3, 1, 1]:
+        return 'Trójka'
+    if counts == [2, 2, 1]:
+        return 'Dwie pary'
+    if counts == [2, 1, 1, 1]:
+        return 'Para'
+    return 'Wysoka karta'
 
 def evaluate_and_award():
     active_players = [
