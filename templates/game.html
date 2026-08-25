@@ -614,13 +614,22 @@
                 phaseText.textContent = 'Rozdawanie kart...';
                 setHidden(startMessage, true);
                 setHidden(winnerMessage, true);
-            } else if (phase === 'exchange') {
-                phaseText.textContent = isMyTurn
-                    ? 'Twoja kolej — wybierz karty do wymiany'
-                    : `Kolej gracza: ${data.current_player}`;
-                setHidden(startMessage, true);
-                setHidden(winnerMessage, true);
-            } else if (phase === 'showdown') {
+} else if (phase === 'exchange') {
+    if (isMyTurn) {
+        phaseText.textContent = selectedCards.length > 0
+            ? `Twoja kolej — wymienisz ${selectedCards.length} kart(y)`
+            : 'Twoja kolej — wybierz karty do wymiany lub zostaw karty';
+    } else {
+        const prepared = selectedCards.length > 0
+            ? ` Wybrano już ${selectedCards.length} kart(y) do wymiany.`
+            : ' Możesz już zaznaczyć karty do wymiany.';
+
+        phaseText.textContent = `Kolej gracza: ${data.current_player}.${prepared}`;
+    }
+
+    setHidden(startMessage, true);
+    setHidden(winnerMessage, true);
+} else if (phase === 'showdown') {
                 phaseText.textContent = 'Koniec rundy';
                 setHidden(startMessage, true);
                 winnerMessage.textContent = data.winner
@@ -685,19 +694,22 @@
             });
         }
 
-        function toggleCard(index) {
-            if (gameState.phase !== 'exchange' || gameState.current_player !== gameState.username) {
-                return;
-            }
+function toggleCard(index) {
+    // Karty można przygotować do wymiany w całej fazie exchange,
+    // również przed własną turą.
+    if (gameState.phase !== 'exchange') {
+        return;
+    }
 
-            if (selectedCards.includes(index)) {
-                selectedCards = selectedCards.filter(cardIndex => cardIndex !== index);
-            } else {
-                selectedCards.push(index);
-            }
+    if (selectedCards.includes(index)) {
+        selectedCards = selectedCards.filter(cardIndex => cardIndex !== index);
+    } else {
+        selectedCards.push(index);
+    }
 
-            renderCards(gameState.hand || []);
-        }
+    renderCards(gameState.hand || []);
+    updateInterface(gameState);
+}
 
         async function requestGameAction(url, payload = null) {
             const options = { method: 'POST' };
