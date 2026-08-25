@@ -310,6 +310,35 @@ def stand():
     advance_turn(username)
     return jsonify({'status': 'success'})
 
+@app.route('/api/reset_points', methods=['POST'])
+@login_required
+def reset_points():
+    if session.get('username') != 'ms':
+        return jsonify({
+            'status': 'error',
+            'message': 'Tylko użytkownik ms może resetować punkty.'
+        }), 403
+
+    # Nie zmieniaj punktów w trakcie wymiany kart — najpierw trzeba zakończyć rundę.
+    if game_state.get('phase') == 'exchange':
+        return jsonify({
+            'status': 'error',
+            'message': 'Nie można resetować punktów w trakcie rundy. Zakończ ją lub poczekaj na pokaz kart.'
+        }), 400
+
+    for player_data in game_state['players'].values():
+        player_data['points'] = 0
+        player_data['hand'] = []
+
+    game_state['deck'] = []
+    game_state['winner'] = None
+    game_state['current_player'] = None
+    game_state['phase'] = 'waiting'
+
+    return jsonify({
+        'status': 'success',
+        'message': 'Wszystkie punkty zostały wyzerowane. Można rozpocząć nową grę.'
+    })
 
 @app.route('/api/next_round', methods=['POST'])
 @login_required
