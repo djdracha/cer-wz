@@ -325,6 +325,92 @@
             .table-center { width: 270px; }
             .btn { padding: 9px 10px; font-size: 14px; }
         }
+
+        .showdown-panel {
+    position: relative;
+    z-index: 10;
+    width: min(1120px, 100%);
+    margin: 4px auto 24px;
+    padding: 18px;
+    border: 2px solid #a86d18;
+    border-radius: 14px;
+    background: rgba(9, 20, 30, 0.92);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.42);
+}
+
+.showdown-title {
+    margin: 0 0 14px;
+    color: #f3c969;
+    text-align: center;
+    font-size: 23px;
+}
+
+.showdown-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+}
+
+.showdown-player {
+    padding: 14px;
+    border: 1px solid rgba(243, 201, 105, 0.45);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.showdown-player.winner {
+    border-color: #ffe08a;
+    background: rgba(243, 201, 105, 0.16);
+    box-shadow: 0 0 0 2px rgba(243, 201, 105, 0.18);
+}
+
+.showdown-name {
+    color: #fff8e2;
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+}
+
+.showdown-hand-name {
+    margin: 5px 0 10px;
+    color: #f3c969;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+}
+
+.showdown-cards {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.showdown-card {
+    width: 39px;
+    height: 55px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #d1b275;
+    border-radius: 5px;
+    background: #fffef8;
+    color: #1d2023;
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+    line-height: 18px;
+}
+
+.showdown-card.red {
+    color: #bf1c28;
+}
+
+.showdown-card .show-rank {
+    font-size: 16px;
+}
+
+.showdown-card .show-suit {
+    font-size: 20px;
+}
+        
     </style>
 </head>
 <body>
@@ -367,7 +453,10 @@
                 <div id="player-cards" class="cards"></div>
             </section>
         </div>
-
+        <section id="showdown-panel" class="showdown-panel hidden">
+            <h2 class="showdown-title">Pokaz kart</h2>
+            <div id="showdown-grid" class="showdown-grid"></div>
+        </section>
         <p class="legend">Złota ramka oznacza gracza, którego jest kolej. Kliknij własne karty, aby zaznaczyć je do wymiany.</p>
     </main>
 
@@ -400,9 +489,10 @@
                 gameState = data;
                 playerPoints.textContent = data.points ?? 100;
 
-                renderSeats(data);
-                renderCards(data.hand || []);
-                updateInterface(data);
+                    renderSeats(data);
+                    renderCards(data.hand || []);
+                    updateInterface(data);
+                    renderShowdown(data);
             } catch (error) {
                 console.error('Błąd podczas pobierania stanu gry:', error);
             }
@@ -573,6 +663,47 @@
             }
         }
 
+        function renderShowdown(data) {
+    const panel = document.getElementById('showdown-panel');
+    const grid = document.getElementById('showdown-grid');
+
+    if (data.phase !== 'showdown') {
+        panel.classList.add('hidden');
+        grid.innerHTML = '';
+        return;
+    }
+
+    panel.classList.remove('hidden');
+    grid.innerHTML = '';
+
+    for (const [player, playerData] of Object.entries(data.players || {})) {
+        const box = document.createElement('article');
+        box.className = 'showdown-player';
+
+        if (player === data.winner) {
+            box.classList.add('winner');
+        }
+
+        const cardsHtml = (playerData.hand || []).map(card => {
+            const red = card.suit === '♥' || card.suit === '♦' ? 'red' : '';
+            return `
+                <div class="showdown-card ${red}">
+                    <span class="show-rank">${card.rank}</span>
+                    <span class="show-suit">${card.suit}</span>
+                </div>
+            `;
+        }).join('');
+
+        box.innerHTML = `
+            <div class="showdown-name">${player}${player === data.winner ? ' — ZWYCIĘZCA' : ''}</div>
+            <div class="showdown-hand-name">${playerData.hand_name || 'Brak układu'}</div>
+            <div class="showdown-cards">${cardsHtml}</div>
+        `;
+
+        grid.appendChild(box);
+    }
+}
+        
         startButton.addEventListener('click', startGame);
         exchangeButton.addEventListener('click', exchangeCards);
         standButton.addEventListener('click', stand);
