@@ -415,6 +415,81 @@
             background: linear-gradient(#c64545, #7a171d);
             border-color: #f09882;
         } 
+        .chat-panel {
+    width: min(560px, 100%);
+    margin: 0 auto 24px;
+    border: 2px solid #a86d18;
+    border-radius: 14px;
+    overflow: hidden;
+    background: rgba(9, 20, 30, 0.93);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.42);
+    font-family: Arial, sans-serif;
+}
+
+.chat-header {
+    padding: 11px 15px;
+    color: #f3c969;
+    background: rgba(78, 35, 14, 0.55);
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 19px;
+    font-weight: bold;
+}
+
+.chat-messages {
+    height: 185px;
+    overflow-y: auto;
+    padding: 10px 13px;
+}
+
+.chat-empty {
+    color: #aeb8c2;
+    font-size: 13px;
+    text-align: center;
+}
+
+.chat-message {
+    margin-bottom: 8px;
+    color: #edf0eb;
+    font-size: 14px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+.chat-user {
+    color: #f3c969;
+    font-weight: bold;
+}
+
+.chat-form {
+    display: flex;
+    gap: 8px;
+    padding: 10px;
+    border-top: 1px solid rgba(243, 201, 105, 0.28);
+    background: rgba(0, 0, 0, 0.16);
+}
+
+.chat-input {
+    flex: 1;
+    min-width: 0;
+    padding: 10px;
+    border: 1px solid #9a681d;
+    border-radius: 6px;
+    outline: none;
+    color: #182018;
+    background: #fffef8;
+    font-size: 14px;
+}
+
+.chat-send-btn {
+    padding: 9px 13px;
+    border: 1px solid #ffe08a;
+    border-radius: 6px;
+    color: #241607;
+    background: linear-gradient(#f7d982, #bd7a20);
+    cursor: pointer;
+    font-family: Georgia, serif;
+    font-weight: bold;
+}
     </style>
 </head>
 <body>
@@ -462,6 +537,23 @@
             <h2 class="showdown-title">Pokaz kart</h2>
             <div id="showdown-grid" class="showdown-grid"></div>
         </section>
+        <section class="chat-panel" aria-label="Czat graczy">
+    <div class="chat-header">💬 Czat przy stole</div>
+    <div id="chat-messages" class="chat-messages">
+        <div class="chat-empty">Brak wiadomości. Napisz pierwszą wiadomość.</div>
+    </div>
+    <form id="chat-form" class="chat-form">
+        <input
+            id="chat-input"
+            class="chat-input"
+            type="text"
+            maxlength="180"
+            placeholder="Napisz wiadomość..."
+            autocomplete="off"
+        >
+        <button class="chat-send-btn" type="submit">Wyślij</button>
+    </form>
+</section>
         <p class="legend">Złota ramka oznacza gracza, którego jest kolej. Kliknij własne karty, aby zaznaczyć je do wymiany.</p>
     </main>
 
@@ -730,13 +822,96 @@
         alert('Nie udało się zresetować punktów.');
     }
 }
+        let lastChatSignature = '';
+
+function escapeHtml(text) {
+    const element = document.createElement('div');
+    element.textContent = text;
+    return element.innerHTML;
+}
+
+async function updateChat() {
+    try {
+        const response = await fetch('/api/chat');
+        if (!response.ok) {
+            return;
+        }
+
+        const data = await response.json();
+        const messages = data.messages || [];
+        const signature = JSON.stringify(messages);
+
+        if (signature === lastChatSignature) {
+            return;
+        }
+
+        lastChatSignature = signature;
+        const container = document.getElementById('chat-messages');
+
+        if (messages.length === 0) {
+            container.innerHTML = '<div class="chat-empty">Brak wiadomości. Napisz pierwszą wiadomość.</div>';
+            return;
+        }
+
+        container.innerHTML = messages.map(message => `
+            <div class="chat-message">
+                <span class="chat-user">${escapeHtml(message.user)}:</span>
+                ${escapeHtml(message.text)}
+            </div>
+        `).join('');
+
+        container.scrollTop = container.scrollHeight;
+    } catch (error) {
+        console.error('Błąd podczas pobierania czatu:', error);
+    }
+}
+
+async function sendChatMessage(event) {
+    event.preventDefault();
+
+    const input = document.getElementById('chat-input');
+    const text = input.value.trim();
+
+    if (!text) {
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ text })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            alert(data.message || 'Nie udało się wysłać wiadomości.');
+            return;
+        }
+
+        input.value = '';
+        lastChatSignature = '';
+        await updateChat();
+    } catch (error) {
+        console.error('Błąd podczas wysyłania wiadomości:', error);
+    }
+}
         startButton.addEventListener('click', startGame);
         exchangeButton.addEventListener('click', exchangeCards);
         standButton.addEventListener('click', stand);
         nextRoundButton.addEventListener('click', nextRound);
         resetPointsButton.addEventListener('click', resetPoints);
+
+        document.getElementById('chat-form').addEventListener('submit', sendChatMessage);
+        
         updateGameState();
+        updateChat();
         setInterval(updateGameState, 2000);
+        setInterval(updateChat, 2000);
+        
     </script>
 </body>
 </html>
