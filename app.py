@@ -126,6 +126,19 @@ def advance_turn(username):
     else:
         evaluate_and_award()
 
+def points_for_hand(cards):
+    score, _ = hand_details(cards)
+    hand_rank = score[0]
+
+    # 4 = strit, 6 = full, 7 = kareta, 8 = strit w kolorze
+    points_by_rank = {
+        4: 2,
+        6: 3,
+        7: 4,
+        8: 10
+    }
+
+    return points_by_rank.get(hand_rank, 1)
 
 def evaluate_and_award():
     players = [
@@ -135,20 +148,32 @@ def evaluate_and_award():
 
     if not players:
         game_state['winner'] = None
+        game_state['winner_points'] = 0
+        game_state['winner_hand_name'] = ''
         game_state['phase'] = 'showdown'
         return
 
     winner = players[0]
-    best_score = hand_details(game_state['players'][winner]['hand'])[0]
+    best_score, best_hand_name = hand_details(
+        game_state['players'][winner]['hand']
+    )
 
     for player in players[1:]:
-        score = hand_details(game_state['players'][player]['hand'])[0]
+        score, hand_name_value = hand_details(
+            game_state['players'][player]['hand']
+        )
+
         if score > best_score:
             winner = player
             best_score = score
+            best_hand_name = hand_name_value
 
-    game_state['players'][winner]['points'] += 1
+    won_points = points_for_hand(game_state['players'][winner]['hand'])
+
+    game_state['players'][winner]['points'] += won_points
     game_state['winner'] = winner
+    game_state['winner_points'] = won_points
+    game_state['winner_hand_name'] = best_hand_name
     game_state['current_player'] = None
     game_state['phase'] = 'showdown'
 
@@ -248,6 +273,8 @@ def start_game():
 
     game_state['deck'] = create_deck()
     game_state['winner'] = None
+    game_state['winner_points'] = 0
+    game_state['winner_hand_name'] = ''
     game_state['phase'] = 'dealing'
 
     for player in players:
@@ -292,7 +319,9 @@ def get_state():
         'phase': game_state.get('phase', 'waiting'),
         'current_player': game_state.get('current_player'),
         'players': players_data,
-        'winner': game_state.get('winner')
+        'winner': game_state.get('winner'),
+        'winner_points': game_state.get('winner_points', 0),
+        'winner_hand_name': game_state.get('winner_hand_name', '')
     })
 
 
