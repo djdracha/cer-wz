@@ -132,10 +132,11 @@ def points_for_hand(cards):
 
     # 4 = strit, 6 = full, 7 = kareta, 8 = strit w kolorze
     points_by_rank = {
-        4: 2,
-        6: 3,
-        7: 4,
-        8: 10
+    4: 2,   # Strit
+    5: 3,   # Kolor
+    6: 3,   # Full
+    7: 4,   # Kareta
+    8: 10   # Strit w kolorze / poker królewski
     }
 
     return points_by_rank.get(hand_rank, 1)
