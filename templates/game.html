@@ -782,11 +782,75 @@ body {
         font-size: 10px;
     }
 }
+        .header {
+    position: relative;
+    flex-wrap: wrap;
+    gap: 10px 20px;
+}
+
+.points-legend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 5px 12px;
+    color: #f7df9b;
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    line-height: 1.4;
+    text-align: center;
+}
+
+.points-legend span:not(.legend-title)::after {
+    content: ' pkt';
+    color: #cba85a;
+    font-size: 10px;
+}
+
+.legend-title {
+    color: #ffe28a;
+    font-weight: bold;
+}
+
+@media (max-width: 900px) {
+    .points-legend {
+        order: 3;
+        flex-basis: 100%;
+        padding: 3px 0 5px;
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 560px) {
+    .header {
+        padding: 10px 12px;
+    }
+
+    .points-legend {
+        gap: 3px 8px;
+        font-size: 10px;
+    }
+
+    .points-legend span:not(.legend-title)::after {
+        font-size: 9px;
+    }
+}
     </style>
 </head>
 <body>
     <header class="header">
         <h1>🃏 Poker 5-kartowy</h1>
+        <div class="points-legend" aria-label="Legenda punktacji">
+        <span class="legend-title">Punkty:</span>
+        <span>Para 1</span>
+        <span>Dwie pary 1</span>
+        <span>Trójka 1</span>
+        <span>Strit 2</span>
+        <span>Kolor 1</span>
+        <span>Full 3</span>
+        <span>Kareta 4</span>
+        <span>Poker 10</span>
+</div>
         <div class="user-box">
             <span>{{ username }}</span>
             <a href="/logout" class="logout-btn">Wyloguj</a>
