@@ -925,8 +925,8 @@ body {
                 phaseText.textContent = 'Koniec rundy';
                 setHidden(startMessage, true);
                 winnerMessage.textContent = data.winner
-                    ? `Zwycięzca rundy: ${data.winner}. Otrzymuje 1 pkt!`
-                    : 'Runda zakończona.';
+                ? `Zwycięzca rundy: ${data.winner}. Układ: ${data.winner_hand_name}. Zdobywa ${data.winner_points} pkt!`
+                : 'Runda zakończona.';
                 setHidden(winnerMessage, false);
             }
         }
